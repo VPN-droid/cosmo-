@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link id="favicon" rel="icon" type="image/png" href="https://duckduckgo.com/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #000000;
+            margin: 0;
+            overflow: hidden;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a855f7; }
+
+        /* --- SPACE THEME EFFECTS --- */
+        :root {
+            --space-purple: #a855f7;
+            --space-pink: #d946ef;
+        }
+
+        /* Apple Glass Panels */
+        .glass-panel {
+            background: rgba(18, 18, 22, 0.65);
+            backdrop-filter: saturate(180%) blur(24px);
+            -webkit-backdrop-filter: saturate(180%) blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card {
+            background: rgba(25, 25, 28, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 1rem;
+        }
+
+        /* Canvas Background */
+        #cosmo-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Text Gradients & Glows */
+        .text-gradient {
+            background: linear-gradient(to right, var(--space-purple), var(--space-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .glow-button {
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+            transition: all 0.3s ease;
+        }
+        .glow-button:hover {
+            box-shadow: 0 0 30px rgba(217, 70, 239, 0.8);
+            transform: scale(1.05);
+        }
+
+        /* Game Cards */
+        .game-card {
+            background: rgba(15, 15, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .game-card:hover {
+            border-color: rgba(168, 85, 247, 0.5);
+            box-shadow: 0 10px 30px -10px rgba(168, 85, 247, 0.3);
+            transform: translateY(-4px);
+        }
+
+        /* Search Input */
+        .search-input {
+            background: rgba(20, 20, 25, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .search-input:focus {
+            border-color: var(--space-purple);
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.3);
+            outline: none;
+        }
+
+        /* Sidebar Nav */
+        .nav-item {
+            color: #71717a;
+            transition: all 0.2s;
+        }
+        .nav-item:hover, .nav-item.active {
+            color: #fff;
+            text-shadow: 0 0 10px rgba(168, 85, 247, 0.8);
+        }
+        .nav-item.active {
+            background: rgba(168, 85, 247, 0.15);
+            border-radius: 0.5rem;
+        }
+
+        /* Blinking Cursor */
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1em;
+            background-color: var(--space-purple);
+            animation: blink 1s step-end infinite;
+            vertical-align: middle;
+            margin-left: 2px;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+    </style>
+</head>
+<body class="text-white flex h-screen">
+
+    <!-- Background Elements -->
+    <canvas id="cosmo-canvas"></canvas>
+
+    <!-- Panic Mode Overlay (Desmos Disguise) -->
+    <div id="panic-overlay" class="fixed inset-0 z-[100] hidden bg-white">
+        <iframe src="https://www.desmos.com/calculator" class="w-full h-full border-0"></iframe>
+    </div>
+
+    <!-- Narrow Sidebar (Space Theme) -->
+    <nav class="w-14 bg-[#0a0a0a] border-r border-[#1f1f22] flex flex-col items-center py-4 z-20 relative shadow-[5px_0_30px_rgba(0,0,0,0.8)]">
+        <!-- Logo -->
+        <div class="mb-8 text-purple-500 hover:text-pink-500 transition-colors cursor-pointer" onclick="switchTab('home')" title="Cosmo!">
+            <i class="fa-solid fa-meteor text-xl drop-shadow-[0_0_12px_rgba(168,85,247,0.8)]"></i>
+        </div>
+        
+        <!-- Links -->
+        <div class="flex flex-col gap-4 w-full px-2">
+            <button onclick="switchTab('home')" class="nav-btn nav-item active w-9 h-9 flex items-center justify-center mx-auto" data-target="home" title="Home">
+                <i class="fa-solid fa-house text-base"></i>
+            </button>
+            <button onclick="switchTab('games')" class="nav-btn nav-item w-9 h-9 flex items-center justify-center mx-auto" data-target="games" title="Games">
+                <i class="fa-solid fa-gamepad text-base"></i>
+            </button>
+            <button onclick="switchTab('search')" class="nav-btn nav-item w-9 h-9 flex items-center justify-center mx-auto" data-target="search" title="Web Browser">
+                <i class="fa-solid fa-globe text-base"></i>
+            </button>
+            <button onclick="switchTab('settings')" class="nav-btn nav-item w-9 h-9 flex items-center justify-center mx-auto" data-target="settings" title="Settings">
+                <i class="fa-solid fa-gear text-base"></i>
+            </button>
+        </div>
+
+        <!-- Bottom Actions -->
+        <div class="mt-auto flex flex-col gap-4 w-full px-2">
+            <button onclick="togglePanic()" class="nav-item hover:text-red-500 w-9 h-9 flex items-center justify-center mx-auto" title="Panic Mode (~)">
+                <i class="fa-solid fa-eye-slash text-base"></i>
+            </button>
+            <a href="https://discord.com" target="_blank" class="nav-item hover:text-[#5865F2] w-9 h-9 flex items-center justify-center mx-auto" title="Discord">
+                <i class="fa-brands fa-discord text-base"></i>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 relative z-10 overflow-hidden">
+        
+        <!-- HOME VIEW (Matches Screenshot exactly) -->
+        <section id="home-view" class="tab-content absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-300">
+            <div class="absolute top-4 right-6 text-gray-400 hover:text-white cursor-pointer transition-colors">
+                <i class="fa-solid fa-bullhorn text-lg"></i>
+            </div>
+
+            <div class="text-center transform -translate-y-8">
+                <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-3 flex items-center justify-center min-h-[3rem]">
+                    <span id="typed-text"></span><span class="cursor"></span>
+                </h1>
+                <p class="text-gray-400 text-xs md:text-sm mb-6 font-medium">Start your unblocking journey today!</p>
+                
+                <button onclick="switchTab('games')" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full px-6 py-2.5 font-semibold text-sm glow-button flex items-center gap-2 mx-auto">
+                    Get Started <i class="fa-solid fa-sparkles text-xs"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- GAMES VIEW -->
+        <section id="games-view" class="tab-content absolute inset-0 hidden p-6 md:p-8 overflow-y-auto">
+            <div class="max-w-7xl mx-auto">
+                <div class="mb-6 flex justify-between items-end border-b border-gray-800 pb-3">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">Game Library</h2>
+                        <p class="text-gray-400 text-xs mt-1">Highly reliable official domains and open-source mirrors.</p>
+                    </div>
+                    <div class="text-[11px] text-purple-400 hidden md:block">
+                        <i class="fa-solid fa-circle-info mr-1"></i> If an official site refuses to connect, use the Cloak feature!
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 pb-20">
+                    
+                    <!-- Slope -->
+                    <div class="game-card rounded-xl overflow-hidden cursor-pointer group flex flex-col" onclick="openGame('https://cgolden15.github.io/Slope-Game/', 'Slope')">
+                        <div class="h-28 relative overflow-hidden bg-black">
+                            <img src="https://play-lh.googleusercontent.com/uZnjeMAkXosTNEv0_r9pX1Q2QkZ1hQyB24q3_R9d8w_kE1jP2PjNl1jNl2R8r9e_m1o" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" alt="Slope">
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f14] to-transparent"></div>
+                            <i class="fa-solid fa-play absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-[0_0_10px_rgba(168,85,247,1)]"></i>
+                        </div>
+                        <div class="p-3 flex-1 z-10 -mt-6 relative">
+                            <h3 class="text-base font-bold text-white drop-shadow-md">Slope</h3>
+                            <p class="text-gray-400 text-[11px] mt-0.5">Endless neon ball rolling.</p>
+                        </div>
+                    </div>
+
+                    <!-- Retro Bowl -->
+                    <div class="game-card rounded-xl overflow-hidden cursor-pointer group flex flex-col" onclick="openGame('https://bovinedragon.github.io/retro-bowl/', 'Retro Bowl')">
+                        <div class="h-28 relative overflow-hidden bg-black">
+                            <img src="https://play-lh.googleusercontent.com/yU2fJmC5a7N51b2Y7h3R8Q9k2U6A_D6r6eZ7F7G7o1k6h5y6w_xX0pX_Z8d1D1G9PZQ" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" alt="Retro Bowl">
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f14] to-transparent"></div>
+                            <i class="fa-solid fa-play absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-[0_0_10px_rgba(168,85,247,1)]"></i>
+                        </div>
+                        <div class="p-3 flex-1 z-10 -mt-6 relative">
+                            <h3 class="text-base font-bold text-white drop-shadow-md">Retro Bowl</h3>
+                            <p class="text-gray-400 text-[11px] mt-0.5">8-bit football management.</p>
+                        </div>
+                    </div>
+
+                    <!-- 1v1.lol -->
+                    <div class="game-card rounded-xl overflow-hidden cursor-pointer group flex flex-col" onclick="openGame('https://1v1.lol/', '1v1.lol')">
+                        <div class="h-28 relative overflow-hidden bg-black">
+                            <img src="https://images.crazygames.com/1v1-lol_16x9/20231122110214/1v1-lol_16x9-cover?auto=format%2Ccompress&q=90&cs=strip&w=1200" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" alt="1v1.lol">
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f14] to-transparent"></div>
+                            <i class="fa-solid fa-play absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-[0_0_10px_rgba(168,85,247,1)]"></i>
+                            <div class="absolute top-1 right-1 bg-purple-600/80 text-[9px] px-1.5 py-0.5 rounded font-bold">Official</div>
+                        </div>
+                        <div class="p-3 flex-1 z-10 -mt-6 relative">
+                            <h3 class="text-base font-bold text-white drop-shadow-md">1v1.lol</h3>
+                            <p class="text-gray-400 text-[11px] mt-0.5">Build & Shoot Battle Royale.</p>
+                        </div>
+                    </div>
+
+                    <!-- Super Mario 64 -->
+                    <div class="game-card rounded-xl overflow-hidden cursor-pointer group flex flex-col" onclick="openGame('https://sm64js.com/', 'SM64 Decomp')">
+                        <div class="h-28 relative overflow-hidden bg-black">
+                            <img src="https://upload.wikimedia.org/wikipedia/en/6/6a/Super_Mario_64_box_cover.jpg" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" alt="SM64">
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f14] to-transparent"></div>
+                            <i class="fa-solid fa-play absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-[0_0_10px_rgba(168,85,247,1)]"></i>
+                        </div>
+                        <div class="p-3 flex-1 z-10 -mt-6 relative">
+                            <h3 class="text-base font-bold text-white drop-shadow-md">SM64</h3>
+                            <p class="text-gray-400 text-[11px] mt-0.5">WebGL Decompilation port.</p>
+                        </div>
+                    </div>
+
+                    <!-- 2048 -->
+                    <div class="game-card rounded-xl overflow-hidden cursor-pointer group flex flex-col" onclick="openGame('https://gabrielecirulli.github.io/2048/', '2048')">
+                        <div class="h-28 relative overflow-hidden bg-[#faf8ef] flex items-center justify-center">
+                            <div class="text-4xl font-black text-[#776e65] opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500">2048</div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f14] to-transparent opacity-80"></div>
+                            <i class="fa-solid fa-play absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-[0_0_10px_rgba(168,85,247,1)]"></i>
+                        </div>
+                        <div class="p-3 flex-1 z-10 -mt-6 relative">
+                            <h3 class="text-base font-bold text-white drop-shadow-md">2048</h3>
+                            <p class="text-gray-400 text-[11px] mt-0.5">Official math puzzle game.</p>
+                        </div>
+                    </div>
+
+                    <!-- Flappy Bird -->
+                    <div class="game-card rounded-xl overflow-hidden cursor-pointer group flex flex-col" onclick="openGame('https://nebezb.com/floppybird/', 'Flappy Bird')">
+                        <div class="h-28 relative overflow-hidden bg-[#70c5ce] flex items-center justify-center">
+                            <i class="fa-solid fa-dove text-5xl text-yellow-300 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"></i>
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f14] to-transparent opacity-80"></div>
+                            <i class="fa-solid fa-play absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-[0_0_10px_rgba(168,85,247,1)]"></i>
+                        </div>
+                        <div class="p-3 flex-1 z-10 -mt-6 relative">
+                            <h3 class="text-base font-bold text-white drop-shadow-md">Flappy Bird</h3>
+                            <p class="text-gray-400 text-[11px] mt-0.5">Tap to fly, don't hit the pipes.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Core Ball -->
+                    <div class="game-card rounded-xl overflow-hidden cursor-pointer group flex flex-col" onclick="openGame('https://coreball.io/', 'Core Ball')">
+                        <div class="h-28 relative overflow-hidden bg-black flex items-center justify-center">
+                            <i class="fa-solid fa-dharmachakra text-5xl text-white opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"></i>
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f14] to-transparent"></div>
+                            <i class="fa-solid fa-play absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-[0_0_10px_rgba(168,85,247,1)]"></i>
+                        </div>
+                        <div class="p-3 flex-1 z-10 -mt-6 relative">
+                            <h3 class="text-base font-bold text-white drop-shadow-md">Core Ball</h3>
+                            <p class="text-gray-400 text-[11px] mt-0.5">Official pin the needles game.</p>
+                        </div>
+                    </div>
+
+                    <!-- Hextris -->
+                    <div class="game-card rounded-xl overflow-hidden cursor-pointer group flex flex-col" onclick="openGame('https://hextris.io/', 'Hextris')">
+                        <div class="h-28 relative overflow-hidden bg-black flex items-center justify-center">
+                            <i class="fa-solid fa-cube text-5xl text-red-500 opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"></i>
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f14] to-transparent"></div>
+                            <i class="fa-solid fa-play absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-[0_0_10px_rgba(168,85,247,1)]"></i>
+                        </div>
+                        <div class="p-3 flex-1 z-10 -mt-6 relative">
+                            <h3 class="text-base font-bold text-white drop-shadow-md">Hextris</h3>
+                            <p class="text-gray-400 text-[11px] mt-0.5">Rotate the hexagon to clear lines.</p>
+                        </div>
+                    </div>
+
+                    <!-- Cookie Clicker -->
+                    <div class="game-card rounded-xl overflow-hidden cursor-pointer group flex flex-col" onclick="openGame('https://ozh.github.io/cookieclicker/', 'Cookie Clicker')">
+                        <div class="h-28 relative overflow-hidden bg-[#e0aa62] flex items-center justify-center">
+                            <i class="fa-solid fa-cookie-bite text-5xl text-[#5c3a21] opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"></i>
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f14] to-transparent opacity-80"></div>
+                            <i class="fa-solid fa-play absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-[0_0_10px_rgba(168,85,247,1)]"></i>
+                        </div>
+                        <div class="p-3 flex-1 z-10 -mt-6 relative">
+                            <h3 class="text-base font-bold text-white drop-shadow-md">Cookie Clicker</h3>
+                            <p class="text-gray-400 text-[11px] mt-0.5">The classic idle baking game.</p>
+                        </div>
+                    </div>
+
+                    <!-- Google Pac-Man -->
+                    <div class="game-card rounded-xl overflow-hidden cursor-pointer group flex flex-col" onclick="openGame('https://macek.github.io/google_pacman/', 'Pac-Man')">
+                        <div class="h-28 relative overflow-hidden bg-black flex items-center justify-center">
+                            <i class="fa-solid fa-ghost text-5xl text-blue-400 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"></i>
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f14] to-transparent opacity-80"></div>
+                            <i class="fa-solid fa-play absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-[0_0_10px_rgba(168,85,247,1)]"></i>
+                        </div>
+                        <div class="p-3 flex-1 z-10 -mt-6 relative">
+                            <h3 class="text-base font-bold text-white drop-shadow-md">Pac-Man</h3>
+                            <p class="text-gray-400 text-[11px] mt-0.5">Google's 30th Anniversary edition.</p>
+                        </div>
+                    </div>
+
+                    <!-- BrowserQuest -->
+                    <div class="game-card rounded-xl overflow-hidden cursor-pointer group flex flex-col" onclick="openGame('https://browserquest.github.io/', 'BrowserQuest')">
+                        <div class="h-28 relative overflow-hidden bg-black flex items-center justify-center">
+                            <i class="fa-solid fa-khanda text-5xl text-red-400 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"></i>
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f14] to-transparent opacity-80"></div>
+                            <i class="fa-solid fa-play absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-[0_0_10px_rgba(168,85,247,1)]"></i>
+                        </div>
+                        <div class="p-3 flex-1 z-10 -mt-6 relative">
+                            <h3 class="text-base font-bold text-white drop-shadow-md">BrowserQuest</h3>
+                            <p class="text-gray-400 text-[11px] mt-0.5">Mozilla's open-source MMORPG.</p>
+                        </div>
+                    </div>
+
+                    <!-- Lichess -->
+                    <div class="game-card rounded-xl overflow-hidden cursor-pointer group flex flex-col" onclick="openGame('https://lichess.org/', 'Lichess')">
+                        <div class="h-28 relative overflow-hidden bg-gray-200 flex items-center justify-center">
+                            <i class="fa-solid fa-chess-knight text-5xl text-gray-800 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"></i>
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f14] to-transparent opacity-90"></div>
+                            <i class="fa-solid fa-play absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-[0_0_10px_rgba(168,85,247,1)]"></i>
+                        </div>
+                        <div class="p-3 flex-1 z-10 -mt-6 relative">
+                            <h3 class="text-base font-bold text-white drop-shadow-md">Lichess</h3>
+                            <p class="text-gray-400 text-[11px] mt-0.5">Free, open-source online chess.</p>
+                        </div>
+                    </div>
+
+                    <!-- HTML5 Asteroids -->
+                    <div class="game-card rounded-xl overflow-hidden cursor-pointer group flex flex-col" onclick="openGame('https://dmcinnes.github.io/HTML5-Asteroids/', 'Asteroids')">
+                        <div class="h-28 relative overflow-hidden bg-black flex items-center justify-center">
+                            <i class="fa-solid fa-meteor text-5xl text-gray-400 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"></i>
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f14] to-transparent opacity-80"></div>
+                            <i class="fa-solid fa-play absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-[0_0_10px_rgba(168,85,247,1)]"></i>
+                        </div>
+                        <div class="p-3 flex-1 z-10 -mt-6 relative">
+                            <h3 class="text-base font-bold text-white drop-shadow-md">Asteroids</h3>
+                            <p class="text-gray-400 text-[11px] mt-0.5">Classic HTML5 space shooter.</p>
+                        </div>
+                    </div>
+
+                    <!-- Minecraft Classic -->
+                    <div class="game-card rounded-xl overflow-hidden cursor-pointer group flex flex-col" onclick="openGame('https://classic.minecraft.net/', 'Minecraft Classic')">
+                        <div class="h-28 relative overflow-hidden bg-black">
+                            <img src="https://images.crazygames.com/minecraft-classic/20201015111956/minecraft-classic-cover?auto=format%2Ccompress&q=90&cs=strip&w=1200" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" alt="Minecraft">
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f14] to-transparent"></div>
+                            <i class="fa-solid fa-play absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-[0_0_10px_rgba(168,85,247,1)]"></i>
+                            <div class="absolute top-1 right-1 bg-purple-600/80 text-[9px] px-1.5 py-0.5 rounded font-bold">Needs Cloak</div>
+                        </div>
+                        <div class="p-3 flex-1 z-10 -mt-6 relative">
+                            <h3 class="text-base font-bold text-white drop-shadow-md">Minecraft</h3>
+                            <p class="text-gray-400 text-[11px] mt-0.5">Classic web browser edition.</p>
+                        </div>
+                    </div>
+
+                    <!-- Krunker -->
+                    <div class="game-card rounded-xl overflow-hidden cursor-pointer group flex flex-col" onclick="openGame('https://krunker.io/', 'Krunker')">
+                        <div class="h-28 relative overflow-hidden bg-black">
+                            <img src="https://images.crazygames.com/games/krunker-io/cover-1583230656515.png?auto=format%2Ccompress&q=90&cs=strip&w=1200" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" alt="Krunker">
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f14] to-transparent"></div>
+                            <i class="fa-solid fa-play absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-[0_0_10px_rgba(168,85,247,1)]"></i>
+                            <div class="absolute top-1 right-1 bg-purple-600/80 text-[9px] px-1.5 py-0.5 rounded font-bold">Needs Cloak</div>
+                        </div>
+                        <div class="p-3 flex-1 z-10 -mt-6 relative">
+                            <h3 class="text-base font-bold text-white drop-shadow-md">Krunker</h3>
+                            <p class="text-gray-400 text-[11px] mt-0.5">Fast-paced multiplayer FPS.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- SEARCH / BROWSER VIEW -->
+        <section id="search-view" class="tab-content absolute inset-0 hidden flex-col h-full">
+            <!-- Search Home -->
+            <div id="search-home" class="flex-1 flex flex-col items-center justify-center p-6 transition-all duration-300">
+                <div class="max-w-xl w-full text-center transform -translate-y-8">
+                    <h2 class="text-3xl font-bold tracking-tight mb-6">
+                        Cosmo<span class="text-purple-500">Search</span>
+                    </h2>
+                    
+                    <form onsubmit="handleSearch(event)" class="relative group w-full">
+                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-search text-gray-500 group-hover:text-purple-400 transition-colors text-sm"></i>
+                        </div>
+                        <input type="text" id="search-input" placeholder="Search the web securely..." 
+                            class="search-input w-full text-white rounded-full py-3 pl-12 pr-28 text-base">
+                        <button type="submit" class="absolute inset-y-1.5 right-1.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-5 rounded-full font-bold text-sm transition-all hover:opacity-90">
+                            Search
+                        </button>
+                    </form>
+                    <p class="text-xs text-gray-500 mt-4">Powered by Google secure iframe bypass.</p>
+                </div>
+            </div>
+
+            <!-- Active Browser Iframe -->
+            <div id="browser-container" class="hidden flex-col h-full w-full bg-[#0a0a0a] relative z-20">
+                <div class="h-12 bg-[#111114] border-b border-[#222] flex items-center px-4 justify-between">
+                    <div class="flex items-center gap-2 w-full max-w-lg">
+                        <button onclick="closeBrowser()" class="text-purple-400 hover:text-white transition-colors p-1.5" title="Close">
+                            <i class="fa-solid fa-xmark text-lg"></i>
+                        </button>
+                        <button onclick="document.getElementById('main-browser').contentWindow.location.reload()" class="text-gray-400 hover:text-white transition-colors p-1.5">
+                            <i class="fa-solid fa-rotate-right text-sm"></i>
+                        </button>
+                        <div class="flex-1 bg-black rounded-full px-3 py-1.5 text-[11px] text-gray-300 truncate border border-[#333] flex items-center gap-2">
+                            <i class="fa-solid fa-lock text-purple-500"></i>
+                            <span class="text-gray-400" id="browser-url-text">Secure Frame Tunnel</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="openCloaked(document.getElementById('main-browser').src)" class="text-purple-400 hover:text-white bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 px-3 py-1 rounded text-xs font-medium transition-all flex items-center gap-1.5" title="Bypass strict filters">
+                            <i class="fa-solid fa-mask"></i> <span>Cloak Tab</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Notice -->
+                <div class="bg-purple-900/30 text-purple-200 text-[10px] py-1 text-center border-b border-purple-500/20 shadow-[0_2px_5px_rgba(0,0,0,0.5)]">
+                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> If the search refuses to connect, click the <b>Cloak Tab</b> button above to bypass the block!
+                </div>
+                <!-- REMOVED SANDBOX RESTRICTIONS -->
+                <iframe id="main-browser" src="" class="w-full flex-1 border-0 bg-white"></iframe>
+            </div>
+        </section>
+
+        <!-- SEARCH / BROWSER VIEW -->
+        <section id="search-view" class="tab-content absolute inset-0 hidden flex-col h-full">
+            <!-- Search Home -->
+            <div id="search-home" class="flex-1 flex flex-col items-center justify-center p-6 transition-all duration-300">
+                <div class="max-w-xl w-full text-center transform -translate-y-8">
+                    <h2 class="text-3xl font-bold tracking-tight mb-6">
+                        Cosmo<span class="text-purple-500">Search</span>
+                    </h2>
+                    
+                    <form onsubmit="handleSearch(event)" class="relative group w-full">
+                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-search text-gray-500 group-hover:text-purple-400 transition-colors text-sm"></i>
+                        </div>
+                        <input type="text" id="search-input" placeholder="Search the web securely..." 
+                            class="search-input w-full text-white rounded-full py-3 pl-12 pr-28 text-base">
+                        <button type="submit" class="absolute inset-y-1.5 right-1.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-5 rounded-full font-bold text-sm transition-all hover:opacity-90">
+                            Search
+                        </button>
+                    </form>
+                    <p class="text-xs text-gray-500 mt-4">Powered by Google secure iframe bypass.</p>
+                </div>
+            </div>
+
+            <!-- Active Browser Iframe -->
+            <div id="browser-container" class="hidden flex-col h-full w-full bg-[#0a0a0a] relative z-20">
+                <div class="h-12 bg-[#111114] border-b border-[#222] flex items-center px-4 justify-between">
+                    <div class="flex items-center gap-2 w-full max-w-lg">
+                        <button onclick="closeBrowser()" class="text-purple-400 hover:text-white transition-colors p-1.5" title="Close">
+                            <i class="fa-solid fa-xmark text-lg"></i>
+                        </button>
+                        <button onclick="document.getElementById('main-browser').contentWindow.location.reload()" class="text-gray-400 hover:text-white transition-colors p-1.5">
+                            <i class="fa-solid fa-rotate-right text-sm"></i>
+                        </button>
+                        <div class="flex-1 bg-black rounded-full px-3 py-1.5 text-[11px] text-gray-300 truncate border border-[#333] flex items-center gap-2">
+                            <i class="fa-solid fa-lock text-purple-500"></i>
+                            <span class="text-gray-400" id="browser-url-text">Secure Frame Tunnel</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="openCloaked(document.getElementById('main-browser').src)" class="text-purple-400 hover:text-white bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 px-3 py-1 rounded text-xs font-medium transition-all flex items-center gap-1.5" title="Bypass strict filters">
+                            <i class="fa-solid fa-mask"></i> <span>Cloak Tab</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Notice -->
+                <div class="bg-purple-900/30 text-purple-200 text-[10px] py-1 text-center border-b border-purple-500/20 shadow-[0_2px_5px_rgba(0,0,0,0.5)]">
+                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> If the search refuses to connect, click the <b>Cloak Tab</b> button above to bypass the block!
+                </div>
+                <iframe id="main-browser" src="" sandbox="allow-scripts allow-same-origin allow-popups allow-forms" class="w-full flex-1 border-0 bg-white"></iframe>
+            </div>
+        </section>
+
+        <!-- SETTINGS VIEW (Apple Glass Tabs) -->
+        <section id="settings-view" class="tab-content absolute inset-0 hidden p-4 md:p-6 z-10 flex-col items-center justify-center">
+            <div class="glass-panel w-full max-w-[900px] h-full max-h-[80vh] rounded-2xl flex flex-col md:flex-row overflow-hidden relative shadow-2xl">
+                
+                <!-- Settings Sidebar -->
+                <div class="w-full md:w-[200px] border-b md:border-b-0 md:border-r border-white/5 flex flex-col py-6 flex-shrink-0 bg-white/[0.02]">
+                    <h2 class="text-2xl font-bold text-white px-5 mb-6 tracking-tight drop-shadow-md">Settings</h2>
+                    
+                    <nav class="flex-1 overflow-y-auto space-y-0.5">
+                        <button onclick="switchSettingsTab('cloaking')" class="settings-nav-btn w-full flex items-center text-left px-5 py-2.5 text-xs font-medium text-gray-400 hover:text-gray-200 border-l-[3px] border-transparent transition-all" data-settings-target="cloaking">
+                            <i class="fa-solid fa-mask w-5"></i> Cloaking
+                        </button>
+                        
+                        <div class="w-full flex items-center justify-between text-left px-5 py-2.5 text-xs font-medium text-gray-500 cursor-not-allowed">
+                            <div class="flex items-center"><i class="fa-solid fa-puzzle-piece w-5"></i> Plugins</div>
+                            <span class="text-[9px] bg-white/10 text-gray-300 px-1.5 py-0.5 rounded-full">Soon</span>
+                        </div>
+                        
+                        <button onclick="switchSettingsTab('performance')" class="settings-nav-btn w-full flex items-center text-left px-5 py-2.5 text-xs font-medium text-gray-400 hover:text-gray-200 border-l-[3px] border-transparent transition-all" data-settings-target="performance">
+                            <i class="fa-solid fa-gauge-high w-5"></i> Performance
+                        </button>
+                        
+                        <button onclick="switchSettingsTab('themes')" class="settings-nav-btn w-full flex items-center text-left px-5 py-2.5 text-xs font-medium text-gray-400 hover:text-gray-200 border-l-[3px] border-transparent transition-all" data-settings-target="themes">
+                            <i class="fa-solid fa-palette w-5"></i> Themes
+                        </button>
+                        
+                        <button onclick="switchSettingsTab('proxy')" class="settings-nav-btn w-full flex items-center text-left px-5 py-2.5 text-xs font-medium text-[#818cf8] border-l-[3px] border-white transition-all bg-white/5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]" data-settings-target="proxy">
+                            <i class="fa-solid fa-globe w-5 text-[#818cf8]"></i> Proxy & Browser
+                        </button>
+                        
+                        <button onclick="switchSettingsTab('advertising')" class="settings-nav-btn w-full flex items-center text-left px-5 py-2.5 text-xs font-medium text-gray-400 hover:text-gray-200 border-l-[3px] border-transparent transition-all" data-settings-target="advertising">
+                            <i class="fa-solid fa-bullhorn w-5"></i> Advertising
+                        </button>
+
+                        <div class="my-3 border-t border-white/5 mx-5"></div>
+
+                        <button onclick="switchSettingsTab('account')" class="settings-nav-btn w-full flex items-center text-left px-5 py-2.5 text-xs font-medium text-gray-400 hover:text-gray-200 border-l-[3px] border-transparent transition-all" data-settings-target="account">
+                            <i class="fa-regular fa-user w-5"></i> Account
+                        </button>
+                        
+                        <button onclick="switchSettingsTab('about')" class="settings-nav-btn w-full flex items-center text-left px-5 py-2.5 text-xs font-medium text-gray-400 hover:text-gray-200 border-l-[3px] border-transparent transition-all" data-settings-target="about">
+                            <i class="fa-solid fa-chart-simple w-5"></i> Statistics
+                        </button>
+
+                        <div class="my-3 border-t border-white/5 mx-5"></div>
+                        
+                        <button onclick="switchSettingsTab('news')" class="settings-nav-btn w-full flex items-center text-left px-5 py-2.5 text-xs font-medium text-gray-400 hover:text-gray-200 border-l-[3px] border-transparent transition-all" data-settings-target="news">
+                            <i class="fa-solid fa-rocket w-5"></i> Updates
+                        </button>
+                        
+                        <button onclick="switchSettingsTab('faq')" class="settings-nav-btn w-full flex items-center text-left px-5 py-2.5 text-xs font-medium text-gray-400 hover:text-gray-200 border-l-[3px] border-transparent transition-all" data-settings-target="faq">
+                            <i class="fa-regular fa-circle-question w-5"></i> FAQ
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Settings Content Area -->
+                <div class="flex-1 overflow-y-auto p-6 md:p-8 relative">
+                    
+                    <!-- Proxy & Browser Tab (Active by default) -->
+                    <div id="settings-content-proxy" class="settings-inner-tab space-y-4 max-w-2xl mx-auto w-full">
+                        <!-- Proxy Card -->
+                        <div class="glass-card p-5 shadow-lg transition-all hover:bg-white/[0.05]">
+                            <h3 class="text-lg font-bold text-white mb-2 tracking-wide drop-shadow-md">Proxy</h3>
+                            <p class="text-[#94a3b8] text-xs mb-3 leading-relaxed">
+                                Proxies are what run the unblocking backend for you to enjoy the games and apps that we display.
+                            </p>
+                            <p class="text-[#94a3b8] text-xs mb-4 leading-relaxed">
+                                Changing the proxy may make some games perform better, run sites faster, and may make your overall experience better. For more information, join our <a href="https://discord.com" target="_blank" class="text-gray-300 underline hover:text-[#818cf8] transition-colors">Discord</a>.
+                            </p>
+                            <div class="relative w-64">
+                                <select id="proxy-select" onchange="saveSetting('cosmo_proxy', this.value); showToast('Proxy switched to ' + this.value)" class="w-full bg-[#111114] border border-[#333] text-white text-xs rounded-lg focus:ring-[#818cf8] focus:border-[#818cf8] block px-3 py-2 appearance-none cursor-pointer outline-none hover:border-[#555] transition-colors shadow-inner">
+                                    <option value="Scramjet">Scramjet</option>
+                                    <option value="Ultraviolet">Ultraviolet</option>
+                                    <option value="Rammerhead">Rammerhead</option>
+                                    <option value="Rhodium">Rhodium</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-white">
+                                    <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Transport Card -->
+                        <div class="glass-card p-5 shadow-lg transition-all hover:bg-white/[0.05]">
+                            <h3 class="text-lg font-bold text-white mb-2 tracking-wide drop-shadow-md">Transport</h3>
+                            <p class="text-[#94a3b8] text-xs mb-3 leading-relaxed">
+                                Transport is the method of how the proxy will transport information
+                            </p>
+                            <p class="text-[#94a3b8] text-xs mb-4 leading-relaxed">
+                                Changing the transport may make some proxies perform better, but may also cause issues for others. Transport switching is an advanced feature, not recommended if you dont know what your doing.
+                            </p>
+                            <div class="relative w-64">
+                                <select id="transport-select" onchange="saveSetting('cosmo_transport', this.value); showToast('Transport switched to ' + this.value)" class="w-full bg-[#111114] border border-[#333] text-white text-xs rounded-lg focus:ring-[#818cf8] focus:border-[#818cf8] block px-3 py-2 appearance-none cursor-pointer outline-none hover:border-[#555] transition-colors shadow-inner">
+                                    <option value="Libcurl">Libcurl</option>
+                                    <option value="Bare">Bare</option>
+                                    <option value="Epoxy">Epoxy</option>
+                                    <option value="Wisp">Wisp</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-white">
+                                    <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Wisp Server Card -->
+                        <div class="glass-card p-5 shadow-lg transition-all hover:bg-white/[0.05]">
+                            <h3 class="text-lg font-bold text-white mb-2 tracking-wide drop-shadow-md">Wisp Server</h3>
+                            <p class="text-[#94a3b8] text-xs mb-4 leading-relaxed">
+                                Enter an Alternative Wisp Server to connect to. This url must start with a ws(s)://
+                            </p>
+                            <div class="relative w-full max-w-sm">
+                                <input type="text" id="wisp-input" placeholder="wss://your-wisp-server.com/" class="w-full bg-[#111114] border border-[#333] text-white text-xs rounded-lg focus:ring-[#818cf8] focus:border-[#818cf8] block px-3 py-2 outline-none hover:border-[#555] transition-colors shadow-inner placeholder-[#555]">
+                            </div>
+                            <button onclick="saveSetting('cosmo_wisp', document.getElementById('wisp-input').value); showToast('Wisp server saved!')" class="mt-3 bg-[#222] hover:bg-[#333] border border-[#444] text-white px-4 py-1.5 rounded-md text-xs font-medium transition-colors">Save Server</button>
+                        </div>
+                    </div>
+
+                    <!-- Cloaking Tab -->
+                    <div id="settings-content-cloaking" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full">
+                        <div class="glass-card p-6">
+                            <h3 class="text-xl font-bold text-white mb-2"><i class="fa-solid fa-mask mr-2 text-gray-400"></i> Tab Disguise</h3>
+                            <p class="text-[#94a3b8] text-xs mb-6">Change the appearance of the current tab to hide it from teachers and history logs.</p>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-300 mb-1">Tab Title</label>
+                                    <input type="text" id="cloak-title-input" placeholder="e.g. Google Docs" class="w-full max-w-xs bg-[#111114] border border-[#333] text-white text-xs rounded-lg focus:ring-[#818cf8] focus:border-[#818cf8] px-3 py-2 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-300 mb-1">Tab Icon URL (Favicon)</label>
+                                    <input type="text" id="cloak-icon-input" placeholder="e.g. https://google.com/favicon.ico" class="w-full max-w-md bg-[#111114] border border-[#333] text-white text-xs rounded-lg focus:ring-[#818cf8] focus:border-[#818cf8] px-3 py-2 outline-none">
+                                </div>
+                                <div class="pt-2">
+                                    <button onclick="applyManualCloak()" class="bg-[#818cf8] hover:bg-indigo-500 text-white font-bold py-2 px-5 rounded-md text-xs transition-colors">Apply Disguise</button>
+                                    <button onclick="resetCloak()" class="ml-2 bg-[#222] hover:bg-[#333] border border-[#444] text-white py-2 px-5 rounded-md text-xs transition-colors">Reset</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card p-6 mt-4">
+                            <h3 class="text-lg font-bold text-white mb-2"><i class="fa-solid fa-bolt mr-2 text-yellow-500"></i> Panic Key</h3>
+                            <p class="text-[#94a3b8] text-xs mb-4">Pressing the panic key instantly hides the portal and opens a safe site.</p>
+                            <div class="flex items-center gap-4">
+                                <div class="bg-[#111114] border border-[#333] text-white text-xs rounded-lg px-4 py-2 text-center w-24">
+                                    <kbd class="font-mono text-lg">~</kbd>
+                                </div>
+                                <div class="text-xs text-gray-500">Currently bound to the <code class="bg-black/50 px-1 py-0.5 rounded">Tilde (~)</code> key.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performance Tab -->
+                    <div id="settings-content-performance" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full">
+                        <div class="glass-card p-6">
+                            <h3 class="text-xl font-bold text-white mb-2"><i class="fa-solid fa-gauge-high mr-2 text-green-400"></i> Performance Settings</h3>
+                            <p class="text-[#94a3b8] text-xs mb-6">Disable visual effects to increase framerate and save battery on lower-end devices.</p>
+                            
+                            <div class="space-y-5">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-sm font-medium text-white">Animated Background</div>
+                                        <div class="text-[11px] text-gray-500">Displays floating particles and nebulas on the canvas.</div>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                      <input type="checkbox" checked onchange="toggleParticles(this)" class="sr-only peer">
+                                      <div class="w-9 h-5 bg-[#333] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#818cf8]"></div>
+                                    </label>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-sm font-medium text-white">Glassmorphism Blur</div>
+                                        <div class="text-[11px] text-gray-500">High-quality backdrop filters on UI elements.</div>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                      <input type="checkbox" checked onchange="showToast('Requires reload to apply.')" class="sr-only peer">
+                                      <div class="w-9 h-5 bg-[#333] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#818cf8]"></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Themes Tab -->
+                    <div id="settings-content-themes" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full">
+                        <div class="glass-card p-6">
+                            <h3 class="text-xl font-bold text-white mb-2"><i class="fa-solid fa-palette mr-2 text-pink-400"></i> Appearance</h3>
+                            <p class="text-[#94a3b8] text-xs mb-6">Select a color scheme. This changes the glows, text gradients, and canvas background.</p>
+                            
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                <!-- Default Space -->
+                                <button onclick="setTheme('#a855f7', '#d946ef')" class="h-20 rounded-xl bg-gradient-to-br from-[#a855f7] to-[#d946ef] border-2 border-white/20 hover:scale-105 transition-all shadow-[0_0_15px_rgba(168,85,247,0.4)] relative flex items-center justify-center group">
+                                    <span class="bg-black/40 text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">Cosmo (Default)</span>
+                                </button>
+                                <!-- Ocean -->
+                                <button onclick="setTheme('#3b82f6', '#06b6d4')" class="h-20 rounded-xl bg-gradient-to-br from-[#3b82f6] to-[#06b6d4] border-2 border-transparent hover:border-white/20 hover:scale-105 transition-all relative flex items-center justify-center group">
+                                    <span class="bg-black/40 text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">Ocean Blue</span>
+                                </button>
+                                <!-- Crimson -->
+                                <button onclick="setTheme('#ef4444', '#f97316')" class="h-20 rounded-xl bg-gradient-to-br from-[#ef4444] to-[#f97316] border-2 border-transparent hover:border-white/20 hover:scale-105 transition-all relative flex items-center justify-center group">
+                                    <span class="bg-black/40 text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">Crimson Fire</span>
+                                </button>
+                                <!-- Toxic -->
+                                <button onclick="setTheme('#22c55e', '#14b8a6')" class="h-20 rounded-xl bg-gradient-to-br from-[#22c55e] to-[#14b8a6] border-2 border-transparent hover:border-white/20 hover:scale-105 transition-all relative flex items-center justify-center group">
+                                    <span class="bg-black/40 text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">Toxic Green</span>
+                                </button>
+                                <!-- Cyberpunk -->
+                                <button onclick="setTheme('#eab308', '#ec4899')" class="h-20 rounded-xl bg-gradient-to-br from-[#eab308] to-[#ec4899] border-2 border-transparent hover:border-white/20 hover:scale-105 transition-all relative flex items-center justify-center group">
+                                    <span class="bg-black/40 text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">Cyberpunk</span>
+                                </button>
+                                <!-- Monochrome -->
+                                <button onclick="setTheme('#94a3b8', '#cbd5e1')" class="h-20 rounded-xl bg-gradient-to-br from-[#475569] to-[#cbd5e1] border-2 border-transparent hover:border-white/20 hover:scale-105 transition-all relative flex items-center justify-center group">
+                                    <span class="bg-black/40 text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">Monochrome</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Advertising Tab -->
+                    <div id="settings-content-advertising" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full">
+                        <div class="glass-card p-6">
+                            <h3 class="text-xl font-bold text-white mb-2"><i class="fa-solid fa-bullhorn mr-2 text-yellow-400"></i> Advertising & Support</h3>
+                            <p class="text-[#94a3b8] text-xs mb-6">Support the developers by allowing unintrusive advertisements.</p>
+                            
+                            <div class="space-y-5">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-sm font-medium text-white">Block Ads in Browser</div>
+                                        <div class="text-[11px] text-gray-500">Injects an adblocker into the stealth frame.</div>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                      <input type="checkbox" onchange="showToast('Adblocker toggled!')" class="sr-only peer">
+                                      <div class="w-9 h-5 bg-[#333] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#818cf8]"></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Account Tab -->
+                    <div id="settings-content-account" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full">
+                        <div class="glass-card p-6 flex flex-col items-center justify-center text-center py-10">
+                            <div class="w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(168,85,247,0.4)]">
+                                <i class="fa-solid fa-user text-3xl text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white">Not Signed In</h3>
+                            <p class="text-[#94a3b8] text-xs mt-2 mb-6 max-w-sm">Sign in to sync your themes, high scores, and proxy configurations across devices.</p>
+                            <button onclick="showToast('Login coming soon!')" class="bg-white text-black font-bold py-2 px-8 rounded-full text-sm hover:bg-gray-200 transition-colors">Sign In / Register</button>
+                        </div>
+                    </div>
+
+                    <!-- About / Statistics Tab -->
+                    <div id="settings-content-about" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="glass-card p-5 text-center">
+                                <i class="fa-solid fa-gamepad text-3xl text-[#818cf8] mb-2"></i>
+                                <div id="stat-games" class="text-2xl font-black text-white">0</div>
+                                <div class="text-[10px] text-gray-400 uppercase tracking-widest">Games Played</div>
+                            </div>
+                            <div class="glass-card p-5 text-center">
+                                <i class="fa-solid fa-clock text-3xl text-pink-400 mb-2"></i>
+                                <div id="stat-time" class="text-2xl font-black text-white">0h 0m</div>
+                                <div class="text-[10px] text-gray-400 uppercase tracking-widest">Time Browsing</div>
+                            </div>
+                        </div>
+                        <div class="glass-card p-6 text-center mt-4">
+                            <i class="fa-solid fa-meteor text-4xl text-purple-500 mb-2"></i>
+                            <h3 class="text-xl font-bold text-white">Cosmo!</h3>
+                            <div class="text-xs text-purple-400 font-mono mt-1 mb-4">Version 2.5.0-beta</div>
+                            <p class="text-[#94a3b8] text-xs max-w-sm mx-auto">The ultimate stealth dashboard. Made with <i class="fa-solid fa-heart text-red-500 mx-1"></i> for students everywhere.</p>
+                        </div>
+                    </div>
+
+                    <!-- News & Updates Tab -->
+                    <div id="settings-content-news" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full">
+                        <div class="glass-card p-6">
+                            <h3 class="text-xl font-bold text-white mb-6"><i class="fa-solid fa-newspaper mr-2 text-blue-400"></i> Changelog</h3>
+                            
+                            <div class="space-y-6 relative before:absolute before:inset-0 before:ml-2 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-700 before:to-transparent">
+                                <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                                    <div class="flex items-center justify-center w-5 h-5 rounded-full border-2 border-[#818cf8] bg-[#0a0a0a] group-[.is-active]:bg-[#818cf8] text-gray-500 group-[.is-active]:text-white shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-[0_0_10px_rgba(129,140,248,0.5)] z-10"></div>
+                                    <div class="w-[calc(100%-2rem)] md:w-[calc(50%-1.5rem)] p-4 rounded-xl border border-white/10 bg-black/40 shadow">
+                                        <div class="flex items-center justify-between mb-1">
+                                            <div class="font-bold text-white text-sm">v2.5.0 - Settings Overhaul</div>
+                                            <time class="font-mono text-[10px] text-purple-400">Today</time>
+                                        </div>
+                                        <div class="text-xs text-gray-400">Added themes, performance toggles, stats, and a brand new Apple Glass settings UI.</div>
+                                    </div>
+                                </div>
+                                <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+                                    <div class="flex items-center justify-center w-5 h-5 rounded-full border-2 border-gray-600 bg-[#0a0a0a] text-gray-500 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10"></div>
+                                    <div class="w-[calc(100%-2rem)] md:w-[calc(50%-1.5rem)] p-4 rounded-xl border border-white/5 bg-black/20 shadow opacity-70">
+                                        <div class="flex items-center justify-between mb-1">
+                                            <div class="font-bold text-gray-300 text-sm">v2.1.0 - Game Mirrors</div>
+                                        </div>
+                                        <div class="text-xs text-gray-500">Fixed broken game links by migrating to math-craft github mirrors. Added Cloak feature.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Tab -->
+                    <div id="settings-content-faq" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full">
+                        <div class="glass-card p-6">
+                            <h3 class="text-xl font-bold text-white mb-6"><i class="fa-solid fa-circle-question mr-2 text-indigo-400"></i> Frequently Asked Questions</h3>
+                            
+                            <div class="space-y-4">
+                                <div class="border border-white/10 rounded-lg p-4 bg-black/20">
+                                    <h4 class="text-sm font-bold text-white mb-1">Why do some games show a blank screen?</h4>
+                                    <p class="text-xs text-gray-400">Some schools use deep packet inspection that blocks websites from loading inside iframes. If this happens, use the <b class="text-purple-400">Cloak Tab</b> button to bypass the filter.</p>
+                                </div>
+                                <div class="border border-white/10 rounded-lg p-4 bg-black/20">
+                                    <h4 class="text-sm font-bold text-white mb-1">What is the Panic Key?</h4>
+                                    <p class="text-xs text-gray-400">By pressing the tilde key (`~`), the screen instantly transforms into a graphing calculator to hide your activity. Press it again to return.</p>
+                                </div>
+                                <div class="border border-white/10 rounded-lg p-4 bg-black/20">
+                                    <h4 class="text-sm font-bold text-white mb-1">What does Transport mean?</h4>
+                                    <p class="text-xs text-gray-400">It's the method our backend proxy uses to fetch data. Libcurl and Bare are standard. If sites aren't loading, trying switching it.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Placeholder Tab (For disabled ones) -->
+                    <div id="settings-content-placeholder" class="settings-inner-tab hidden flex-col items-center justify-center h-full opacity-50 pt-6 w-full mx-auto">
+                        <i class="fa-solid fa-screwdriver-wrench text-5xl text-gray-600 mb-4"></i>
+                        <h3 class="text-xl font-bold text-gray-400">Under Construction</h3>
+                        <p class="text-gray-500 text-sm mt-1">This settings page is coming soon.</p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Game Player Modal -->
+    <div id="game-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex-col items-center justify-center backdrop-blur-2xl p-2 md:p-6">
+        <div class="w-full max-w-6xl glass-panel rounded-[1.5rem] flex flex-col h-full relative overflow-hidden">
+            
+            <!-- Top Bar -->
+            <div class="h-12 bg-white/[0.03] border-b border-white/10 flex items-center justify-between px-4 z-10">
+                <h3 id="game-title" class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-gamepad text-purple-500 text-sm"></i>
+                    <span>Loading Game...</span>
+                </h3>
+                
+                <div class="flex items-center gap-2">
+                    <button onclick="openCloaked(document.getElementById('game-frame').src)" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-3 py-1 rounded font-bold text-xs glow-button flex items-center gap-1.5" title="Open stealthy tab">
+                        <i class="fa-solid fa-mask"></i> <span class="hidden sm:inline">Cloak Tab</span>
+                    </button>
+                    <div class="w-px h-5 bg-gray-700 mx-1"></div>
+                    <button onclick="document.getElementById('game-frame').requestFullscreen()" class="text-gray-400 hover:text-white transition-colors w-7 h-7 flex items-center justify-center" title="Fullscreen">
+                        <i class="fa-solid fa-expand text-sm"></i>
+                    </button>
+                    <button onclick="closeGame()" class="text-gray-400 hover:text-white bg-red-500/10 hover:bg-red-500 border border-transparent hover:border-red-400 transition-all rounded-full w-7 h-7 flex items-center justify-center ml-1">
+                        <i class="fa-solid fa-xmark text-sm"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Error Warning Banner -->
+            <div class="absolute top-12 left-0 right-0 text-center pointer-events-none opacity-60 text-xs text-gray-400 z-0 py-8">
+                <i class="fa-solid fa-circle-notch fa-spin text-purple-500 text-2xl mb-3 block"></i>
+                <p>If the screen stays blank or says "refused to connect"...</p>
+                <p class="text-purple-400 font-bold mt-1">Click the "Cloak Tab" button at the top right!</p>
+            </div>
+
+            <div class="flex-1 bg-black w-full relative z-10">
+                <!-- REMOVED SANDBOX RESTRICTIONS -->
+                <iframe id="game-frame" src="" class="absolute inset-0 w-full h-full border-0 bg-transparent"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-[#1a1a1a] border border-purple-500/50 text-white px-6 py-3 rounded-lg shadow-[0_0_20px_rgba(168,85,247,0.3)] transform translate-y-24 opacity-0 transition-all duration-300 z-[100] flex items-center gap-3">
+        <i class="fa-solid fa-circle-check text-purple-500"></i>
+        <span id="toast-message" class="font-medium text-sm">Settings saved</span>
+    </div>
+
+    <script>
+        // --- State & Settings Variables ---
+        let currentPurpleRGB = '168, 85, 247';
+        let currentPinkRGB = '217, 70, 239';
+        let stats = JSON.parse(localStorage.getItem('cosmo_stats')) || { gamesPlayed: 0, secondsBrowsing: 0 };
+        let particlesEnabled = true;
+
+        function saveSetting(key, value) {
+            localStorage.setItem(key, value);
+        }
+
+        function hexToRgb(hex) {
+            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '168, 85, 247';
+        }
+
+        // --- Stats Tracking ---
+        function saveStats() {
+            localStorage.setItem('cosmo_stats', JSON.stringify(stats));
+            updateStatsUI();
+        }
+
+        function updateStatsUI() {
+            const gamesEl = document.getElementById('stat-games');
+            const timeEl = document.getElementById('stat-time');
+            if (gamesEl) gamesEl.innerText = stats.gamesPlayed;
+            if (timeEl) {
+                let h = Math.floor(stats.secondsBrowsing / 3600);
+                let m = Math.floor((stats.secondsBrowsing % 3600) / 60);
+                timeEl.innerText = `${h}h ${m}m`;
+            }
+        }
+
+        setInterval(() => {
+            stats.secondsBrowsing++;
+            if (stats.secondsBrowsing % 10 === 0) saveStats(); // Save every 10 sec
+            updateStatsUI();
+        }, 1000);
+
+        // --- Settings Logic (Themes, Cloaking, Performance) ---
+        
+        // Theme Engine
+        function setTheme(purple, pink, showNotification = true) {
+            document.documentElement.style.setProperty('--space-purple', purple);
+            document.documentElement.style.setProperty('--space-pink', pink);
+            
+            currentPurpleRGB = hexToRgb(purple);
+            currentPinkRGB = hexToRgb(pink);
+            
+            localStorage.setItem('cosmo_theme_purple', purple);
+            localStorage.setItem('cosmo_theme_pink', pink);
+            
+            // Update running particles to match theme colors roughly
+            if (typeof particles !== 'undefined') {
+                particles.forEach(p => {
+                    p.color = Math.random() > 0.5 ? purple : pink;
+                });
+            }
+            
+            if (showNotification) showToast('Theme updated!');
+        }
+
+        // Cloaking Engine
+        function applyManualCloak() {
+            const title = document.getElementById('cloak-title-input').value || 'Classes';
+            const icon = document.getElementById('cloak-icon-input').value || 'https://ssl.gstatic.com/docs/doclist/images/create_14_px.png';
+            
+            document.title = title;
+            document.getElementById('favicon').href = icon;
+            
+            localStorage.setItem('cosmo_cloak_title', title);
+            localStorage.setItem('cosmo_cloak_icon', icon);
+            
+            showToast('Disguise applied successfully!');
+        }
+
+        function resetCloak() {
+            document.title = 'Dashboard';
+            document.getElementById('favicon').href = 'https://duckduckgo.com/favicon.ico';
+            document.getElementById('cloak-title-input').value = '';
+            document.getElementById('cloak-icon-input').value = '';
+            
+            localStorage.removeItem('cosmo_cloak_title');
+            localStorage.removeItem('cosmo_cloak_icon');
+            
+            showToast('Disguise removed.');
+        }
+
+        // Performance Toggles
+        function toggleParticles(checkbox) {
+            particlesEnabled = checkbox.checked;
+            document.getElementById('cosmo-canvas').style.display = particlesEnabled ? 'block' : 'none';
+            showToast(particlesEnabled ? 'Animated Background ON' : 'Animated Background OFF');
+        }
+
+        // --- Toast Notification Logic ---
+        let toastTimeout;
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = message;
+            
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+
+        // --- Cosmo Canvas Animated Glow Background ---
+        const canvas = document.getElementById('cosmo-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+        
+        function resizeCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 2 + 0.5;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.color = Math.random() > 0.5 ? '#a855f7' : '#d946ef';
+                this.glow = Math.random() * 15 + 5;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = this.glow;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.shadowBlur = 0; // reset
+            }
+        }
+        
+        for (let i = 0; i < 120; i++) particles.push(new Particle());
+        
+        function animateCosmo() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'; 
+            ctx.fillRect(0, 0, width, height);
+            
+            // Constellations/Lines
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                for (let j = i; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(${currentPurpleRGB}, ${(1 - dist/120) * 0.4})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            
+            // Giant animated glowing nebulas
+            const time = Date.now() * 0.0005;
+            ctx.globalCompositeOperation = 'screen';
+            
+            ctx.beginPath();
+            ctx.arc(width/2 + Math.cos(time)*200, height/2 + Math.sin(time*0.8)*100, 400, 0, Math.PI*2);
+            const grad1 = ctx.createRadialGradient(width/2 + Math.cos(time)*200, height/2 + Math.sin(time*0.8)*100, 0, width/2 + Math.cos(time)*200, height/2 + Math.sin(time*0.8)*100, 400);
+            grad1.addColorStop(0, `rgba(${currentPurpleRGB}, 0.15)`);
+            grad1.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad1;
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(width/2 + Math.sin(time*0.5)*300, height/2 + Math.cos(time*0.3)*200, 500, 0, Math.PI*2);
+            const grad2 = ctx.createRadialGradient(width/2 + Math.sin(time*0.5)*300, height/2 + Math.cos(time*0.3)*200, 0, width/2 + Math.sin(time*0.5)*300, height/2 + Math.cos(time*0.3)*200, 500);
+            grad2.addColorStop(0, `rgba(${currentPinkRGB}, 0.1)`);
+            grad2.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad2;
+            ctx.fill();
+            
+            ctx.globalCompositeOperation = 'source-over';
+            requestAnimationFrame(animateCosmo);
+        }
+        animateCosmo();
+
+        // --- Typing Animation ---
+        const baseText = "Welcome to ";
+        const gradientWord = "Cosmo!";
+        const typedTextSpan = document.getElementById("typed-text");
+        let charIndex = 0;
+        
+        function typeWriter() {
+            if (charIndex < (baseText.length + gradientWord.length)) {
+                if (charIndex < baseText.length) {
+                    typedTextSpan.innerHTML = baseText.substring(0, charIndex + 1);
+                } else {
+                    const glowPart = gradientWord.substring(0, (charIndex + 1) - baseText.length);
+                    typedTextSpan.innerHTML = baseText + '<span class="text-gradient">' + glowPart + '</span>';
+                }
+                charIndex++;
+                setTimeout(typeWriter, 120); // Typing speed
+            }
+        }
+        
+        window.addEventListener('load', () => {
+            setTimeout(typeWriter, 500); // Start typing after 500ms delay
+            
+            // Restore Settings & Theme
+            const savedPurple = localStorage.getItem('cosmo_theme_purple') || '#a855f7';
+            const savedPink = localStorage.getItem('cosmo_theme_pink') || '#d946ef';
+            setTheme(savedPurple, savedPink, false);
+            
+            document.getElementById('proxy-select').value = localStorage.getItem('cosmo_proxy') || 'Scramjet';
+            document.getElementById('transport-select').value = localStorage.getItem('cosmo_transport') || 'Libcurl';
+            document.getElementById('wisp-input').value = localStorage.getItem('cosmo_wisp') || '';
+            
+            const savedTitle = localStorage.getItem('cosmo_cloak_title');
+            const savedIcon = localStorage.getItem('cosmo_cloak_icon');
+            if(savedTitle) document.title = savedTitle;
+            if(savedIcon) document.getElementById('favicon').href = savedIcon;
+            
+            updateStatsUI();
+        });
+
+        // --- Navigation Logic ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('flex');
+            });
+            
+            const target = document.getElementById(`${tabId}-view`);
+            target.classList.remove('hidden');
+            if (tabId === 'home') target.classList.add('flex');
+            if (tabId === 'search') target.classList.add('flex');
+            if (tabId === 'settings') target.classList.add('flex');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if(btn.dataset.target === tabId) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        function switchSettingsTab(targetId) {
+            // Hide all inner tabs
+            document.querySelectorAll('.settings-inner-tab').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('flex');
+            });
+            
+            // Show target or placeholder
+            const targetEl = document.getElementById(`settings-content-${targetId}`);
+            if (targetEl) {
+                targetEl.classList.remove('hidden');
+                if(targetId === 'placeholder') targetEl.classList.add('flex');
+            } else {
+                const placeholder = document.getElementById('settings-content-placeholder');
+                placeholder.classList.remove('hidden');
+                placeholder.classList.add('flex');
+            }
+
+            // Update sidebar UI
+            document.querySelectorAll('.settings-nav-btn').forEach(btn => {
+                const icon = btn.querySelector('i');
+                if (btn.dataset.settingsTarget === targetId) {
+                    btn.classList.add('text-[#818cf8]', 'border-white', 'bg-white/5', 'shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]');
+                    btn.classList.remove('text-gray-400', 'border-transparent');
+                    icon.classList.add('text-[#818cf8]');
+                } else {
+                    btn.classList.remove('text-[#818cf8]', 'border-white', 'bg-white/5', 'shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]');
+                    btn.classList.add('text-gray-400', 'border-transparent');
+                    icon.classList.remove('text-[#818cf8]');
+                }
+            });
+        }
+
+        // --- Panic Mode Logic ---
+        let isPanic = false;
+        const originalTitle = document.title;
+        const originalFavicon = document.getElementById('favicon').href;
+
+        function togglePanic() {
+            isPanic = !isPanic;
+            const overlay = document.getElementById('panic-overlay');
+            const favicon = document.getElementById('favicon');
+            
+            if (isPanic) {
+                document.title = "Desmos | Graphing Calculator";
+                favicon.href = "https://www.desmos.com/favicon.ico";
+                overlay.classList.remove('hidden');
+                closeGame();
+                closeBrowser();
+            } else {
+                document.title = originalTitle;
+                favicon.href = originalFavicon;
+                overlay.classList.add('hidden');
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '`' || e.key === '~') {
+                togglePanic();
+            }
+        });
+
+        // --- Browser Engine Logic ---
+        function handleSearch(e) {
+            e.preventDefault();
+            const query = document.getElementById('search-input').value.trim();
+            if (!query) return;
+
+            let url = '';
+            if (query.match(/^https?:\/\//)) {
+                url = query;
+            } else if (query.includes('.') && !query.includes(' ')) {
+                url = 'https://' + query;
+            } else {
+                // Bypass using Google igu flag
+                url = `https://www.google.com/search?igu=1&q=${encodeURIComponent(query)}`;
+            }
+            
+            document.getElementById('main-browser').src = url;
+            document.getElementById('search-home').classList.add('hidden');
+            document.getElementById('search-home').classList.remove('flex');
+            document.getElementById('browser-container').classList.remove('hidden');
+            document.getElementById('browser-container').classList.add('flex');
+        }
+
+        function closeBrowser() {
+            document.getElementById('browser-container').classList.add('hidden');
+            document.getElementById('browser-container').classList.remove('flex');
+            document.getElementById('search-home').classList.remove('hidden');
+            document.getElementById('search-home').classList.add('flex');
+            document.getElementById('main-browser').src = '';
+            document.getElementById('search-input').value = '';
+        }
+
+        // --- Iframe Games Logic ---
+        function openGame(url, title) {
+            stats.gamesPlayed++;
+            saveStats();
+            
+            const modal = document.getElementById('game-modal');
+            const frame = document.getElementById('game-frame');
+            const titleEl = document.getElementById('game-title');
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            titleEl.innerHTML = `<i class="fa-solid fa-gamepad text-purple-500"></i> <span>${title}</span>`;
+            frame.src = url;
+            
+            setTimeout(() => frame.focus(), 500);
+        }
+
+        function closeGame() {
+            const modal = document.getElementById('game-modal');
+            const frame = document.getElementById('game-frame');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            frame.src = '';
+        }
+
+        // --- About:Blank Cloaking (The Ultimate Bypass) ---
+        function openCloaked(url) {
+            if (!url || url === 'about:blank') return;
+            
+            // Stop current iframe to prevent double audio
+            document.getElementById('game-frame').src = '';
+            document.getElementById('main-browser').src = '';
+            
+            const win = window.open('about:blank');
+            if (!win) {
+                alert("Your browser blocked the popup. Please click 'Allow Popups' in your URL bar to use the Cloak feature.");
+                return;
+            }
+
+            // Disguise the new tab using saved settings or defaults
+            const savedTitle = localStorage.getItem('cosmo_cloak_title') || "Classes";
+            const savedIcon = localStorage.getItem('cosmo_cloak_icon') || "https://ssl.gstatic.com/docs/doclist/images/create_14_px.png";
+            
+            win.document.title = savedTitle;
+            const icon = win.document.createElement("link");
+            icon.rel = "icon";
+            icon.type = "image/png";
+            icon.href = savedIcon;
+            win.document.head.appendChild(icon);
+
+            win.document.body.style.margin = "0";
+            win.document.body.style.padding = "0";
+            win.document.body.style.height = "100vh";
+            win.document.body.style.overflow = "hidden";
+            win.document.body.style.backgroundColor = "#000";
+
+            // Inject the unblockable iframe without restrictive sandboxes
+            const iframe = win.document.createElement("iframe");
+            iframe.style.border = "none";
+            iframe.style.width = "100%";
+            iframe.style.height = "100%";
+            iframe.style.margin = "0";
+            iframe.src = url;
+
+            win.document.body.appendChild(iframe);
+            
+            // Close UI
+            closeGame();
+            closeBrowser();
+        }
+    </script>
+</body>
+</html>
