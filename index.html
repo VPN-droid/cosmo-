@@ -229,6 +229,21 @@
                 
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 pb-20">
                     
+                    <!-- Zenith Prime (Local Game) -->
+                    <div class="game-card rounded-xl overflow-hidden cursor-pointer group flex flex-col border-t-2 border-t-[#6366f1]" onclick="openZenithPrime()">
+                        <div class="h-28 relative overflow-hidden bg-[#0f172a] flex items-center justify-center">
+                            <div class="absolute inset-0 bg-gradient-to-br from-[#6366f1]/20 to-[#1e293b] opacity-80 mix-blend-overlay"></div>
+                            <i class="fa-solid fa-bolt text-5xl text-[#6366f1] opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 relative z-10"></i>
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f14] to-transparent opacity-90"></div>
+                            <i class="fa-solid fa-play absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-[0_0_10px_rgba(99,102,241,1)] z-20"></i>
+                            <div class="absolute top-1 right-1 bg-[#6366f1]/80 text-[9px] px-1.5 py-0.5 rounded font-bold text-white z-20 shadow-[0_0_5px_rgba(99,102,241,0.8)]">Local App</div>
+                        </div>
+                        <div class="p-3 flex-1 z-10 -mt-6 relative">
+                            <h3 class="text-base font-bold text-white drop-shadow-md">Zenith Prime</h3>
+                            <p class="text-gray-400 text-[11px] mt-0.5">The Future of Risk.</p>
+                        </div>
+                    </div>
+
                     <!-- Slope -->
                     <div class="game-card rounded-xl overflow-hidden cursor-pointer group flex flex-col" onclick="openGame('https://cgolden15.github.io/Slope-Game/', 'Slope')">
                         <div class="h-28 relative overflow-hidden bg-black">
@@ -861,6 +876,2429 @@
         </div>
     </div>
 
+    <!-- Zenith Prime Source Code Storage -->
+    <textarea id="zenith-prime-source" style="display: none;">
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZenithPrime | The Future of Risk</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        zenith: {
+                            900: '#000000',
+                            800: '#0f172a',
+                            700: '#1e293b',
+                            accent: '#6366f1',
+                            gold: '#fbbf24',
+                            danger: '#ef4444',
+                            success: '#10b981'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 3s linear infinite',
+                        'bounce-sm': 'bounce-sm 1s infinite'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --x: 50%;
+            --y: 50%;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #e2e8f0;
+            overflow: hidden; /* App-like feel */
+        }
+        
+        /* Grid Background System */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            pointer-events: none;
+        }
+
+        /* Cursor Spotlight */
+        .cursor-spotlight {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            background: radial-gradient(
+                600px circle at var(--x) var(--y), 
+                rgba(99, 102, 241, 0.15), 
+                transparent 40%
+            );
+            pointer-events: none;
+        }
+
+        /* Custom Cursor Styling */
+        @media (pointer: fine) {
+            * {
+                cursor: none !important;
+            }
+            .custom-cursor {
+                position: fixed;
+                top: 0; left: 0;
+                width: 6px; height: 6px;
+                background: #6366f1;
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 99999;
+                transform: translate(-50%, -50%);
+                box-shadow: 0 0 10px #6366f1;
+                transition: background-color 0.2s, box-shadow 0.2s;
+            }
+            .custom-cursor-follower {
+                position: fixed;
+                top: 0; left: 0;
+                width: 32px; height: 32px;
+                border: 1.5px solid rgba(99, 102, 241, 0.6);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 99998;
+                transform: translate(-50%, -50%);
+                transition: width 0.2s, height 0.2s, background-color 0.2s, border-color 0.2s;
+            }
+            .custom-cursor-follower.hover {
+                width: 48px;
+                height: 48px;
+                background-color: rgba(16, 185, 129, 0.1);
+                border-color: #10b981;
+            }
+        }
+        @media (pointer: coarse) {
+            .custom-cursor, .custom-cursor-follower {
+                display: none !important;
+            }
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .neon-text {
+            text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+        }
+
+        .scroll-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .chip {
+            transition: all 0.2s;
+        }
+        .chip:active {
+            transform: scale(0.95);
+        }
+
+        /* Custom Checkbox for Mines */
+        .mine-tile {
+            transition: all 0.2s;
+            transform-style: preserve-3d;
+        }
+        .mine-tile.flipped {
+            transform: rotateY(180deg);
+        }
+
+        /* NEW: Game Visual Animations */
+        @keyframes coin-flip {
+            0% { transform: rotateY(0); }
+            100% { transform: rotateY(1800deg); }
+        }
+        @keyframes spin-wheel {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(1440deg); }
+        }
+        @keyframes shake-dice {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+        @keyframes rocket-fly {
+            0% { transform: translateY(0); opacity: 1; }
+            50% { transform: translateY(-50px); opacity: 1; }
+            100% { transform: translateY(-100px); opacity: 0; }
+        }
+        @keyframes card-deal {
+            0% { transform: translateY(-50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        .visual-coin { animation: coin-flip 1s ease-out forwards; }
+        .visual-spin { animation: spin-wheel 2s cubic-bezier(0.25, 0.1, 0.25, 1) forwards; }
+        .visual-shake { animation: shake-dice 0.5s linear infinite; }
+        .visual-rocket { animation: rocket-fly 1s ease-in forwards; }
+        .visual-deal { animation: card-deal 0.5s ease-out forwards; }
+
+        /* Loading */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: #000000;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body class="h-screen w-full flex text-sm md:text-base relative">
+
+    <!-- Custom Cursor DOM -->
+    <div class="custom-cursor" id="cursor-dot"></div>
+    <div class="custom-cursor-follower" id="cursor-outline"></div>
+
+    <!-- Background Elements -->
+    <div class="bg-grid"></div>
+    <div class="cursor-spotlight"></div>
+
+    <!-- Sidebar -->
+    <aside class="w-16 md:w-64 bg-transparent border-r border-white/5 flex flex-col justify-between shrink-0 z-20 backdrop-blur-sm">
+        <div>
+            <div class="h-16 flex items-center justify-center md:justify-start md:px-6 border-b border-white/5">
+                <i data-lucide="zap" class="text-zenith-accent w-6 h-6"></i>
+                <span class="ml-3 font-bold text-xl tracking-tight hidden md:block text-white">Zenith<span class="text-zenith-accent">Prime</span></span>
+            </div>
+
+            <nav class="mt-6 flex flex-col gap-2 px-2 overflow-y-auto">
+                <button onclick="window.switchTab('dashboard')" class="nav-btn active flex items-center p-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    <span class="ml-3 hidden md:block font-medium">Dashboard</span>
+                </button>
+                <button onclick="window.switchTab('games')" class="nav-btn flex items-center p-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group">
+                    <i data-lucide="gamepad-2" class="w-5 h-5"></i>
+                    <span class="ml-3 hidden md:block font-medium">Games Hub</span>
+                </button>
+                <!-- NEW ARENA TAB -->
+                <button onclick="window.switchTab('arena')" class="nav-btn flex items-center p-3 text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors group">
+                    <i data-lucide="swords" class="w-5 h-5"></i>
+                    <span class="ml-3 hidden md:block font-bold">PvP Arena</span>
+                </button>
+                <button onclick="window.switchTab('market')" class="nav-btn flex items-center p-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group">
+                    <i data-lucide="trending-up" class="w-5 h-5"></i>
+                    <span class="ml-3 hidden md:block font-medium">Markets</span>
+                </button>
+                <button onclick="window.switchTab('store')" class="nav-btn flex items-center p-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group">
+                    <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                    <span class="ml-3 hidden md:block font-medium">Store</span>
+                </button>
+                <button onclick="window.switchTab('vault')" class="nav-btn flex items-center p-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group">
+                    <i data-lucide="landmark" class="w-5 h-5"></i>
+                    <span class="ml-3 hidden md:block font-medium">The Vault</span>
+                </button>
+                <button onclick="window.switchTab('leaderboard')" class="nav-btn flex items-center p-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group">
+                    <i data-lucide="trophy" class="w-5 h-5"></i>
+                    <span class="ml-3 hidden md:block font-medium">Leaderboard</span>
+                </button>
+            </nav>
+        </div>
+        
+        <div class="p-4 border-t border-white/5">
+            <div class="glass-panel p-3 rounded-xl">
+                <div class="flex justify-between items-center mb-1">
+                    <div class="text-xs text-slate-400">Game Cash</div>
+                    <div class="text-xs text-zenith-gold font-bold">ZC</div>
+                </div>
+                <div class="font-mono font-bold flex justify-between items-center">
+                    <div class="text-zenith-success"><span class="text-xs mr-1 text-slate-500">$</span><span id="ui-balance">1000.00</span></div>
+                    <div class="text-zenith-gold"><span id="ui-zc-balance">0</span></div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 relative overflow-y-auto overflow-x-hidden scroll-hide z-10">
+        <!-- Top Bar -->
+        <div class="h-16 border-b border-white/5 flex items-center justify-between px-6 sticky top-0 bg-black/40 backdrop-blur z-20">
+            <h1 id="page-title" class="text-lg font-semibold text-white">Dashboard</h1>
+            <div class="flex items-center gap-4">
+                <button onclick="window.addFunds()" class="bg-zenith-accent hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-lg shadow-indigo-500/20">
+                    + DEPOSIT
+                </button>
+                <button onclick="window.openProfile()" class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center border border-white/10 hover:bg-slate-600 transition-colors">
+                    <i data-lucide="user" class="w-4 h-4 text-slate-300"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="p-6 max-w-7xl mx-auto pb-20">
+            
+            <!-- 1. DASHBOARD VIEW -->
+            <div id="view-dashboard" class="page-view animate-fade">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Net Worth Card -->
+                    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group">
+                        <div class="absolute -right-6 -top-6 w-32 h-32 bg-zenith-accent/20 rounded-full blur-3xl group-hover:bg-zenith-accent/30 transition-all"></div>
+                        <h3 class="text-slate-400 text-sm font-medium mb-2">Total Net Worth</h3>
+                        <p class="text-3xl font-bold text-white font-mono">$<span id="dash-networth">1000.00</span></p>
+                        <div class="mt-4 flex items-center text-xs text-zenith-success bg-green-500/10 w-fit px-2 py-1 rounded">
+                            <i data-lucide="arrow-up-right" class="w-3 h-3 mr-1"></i>
+                            <span>Live Update</span>
+                        </div>
+                    </div>
+
+                    <!-- Market Status -->
+                    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden">
+                         <h3 class="text-slate-400 text-sm font-medium mb-2">Market Status</h3>
+                         <div class="flex flex-col gap-2 mt-2">
+                             <div class="flex justify-between items-center">
+                                 <span class="text-orange-400 font-bold">BTC</span>
+                                 <span id="dash-btc" class="font-mono">$65000.00</span>
+                             </div>
+                             <div class="flex justify-between items-center">
+                                 <span class="text-zenith-gold font-bold">ZEN</span>
+                                 <span id="dash-zen" class="font-mono">$50.00</span>
+                             </div>
+                         </div>
+                    </div>
+
+                    <!-- Action -->
+                    <div class="glass-panel rounded-2xl p-6 flex flex-col justify-center items-center text-center cursor-pointer hover:border-red-500/50 transition-colors" onclick="window.switchTab('arena')">
+                        <div class="w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center mb-3 text-red-500">
+                            <i data-lucide="swords" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-white font-bold">PvP Arena</h3>
+                        <p class="text-xs text-slate-400">Battle real players for the pot</p>
+                    </div>
+                </div>
+
+                <h2 class="text-xl font-bold text-white mb-4">Featured Games</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div onclick="window.openGame('crash')" class="glass-panel p-4 rounded-xl hover:-translate-y-1 transition-transform cursor-pointer group border-t-4 border-t-zenith-danger">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="p-2 bg-red-500/20 rounded-lg text-red-500"><i data-lucide="trending-up" class="w-6 h-6"></i></div>
+                            <span class="text-xs bg-white/5 px-2 py-1 rounded">Popular</span>
+                        </div>
+                        <h3 class="font-bold text-lg">Crash</h3>
+                        <p class="text-slate-400 text-xs mt-1">Multipliers</p>
+                    </div>
+                    <div onclick="window.openGame('mines')" class="glass-panel p-4 rounded-xl hover:-translate-y-1 transition-transform cursor-pointer border-t-4 border-t-zenith-success">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="p-2 bg-green-500/20 rounded-lg text-green-500"><i data-lucide="bomb" class="w-6 h-6"></i></div>
+                        </div>
+                        <h3 class="font-bold text-lg">Mines</h3>
+                        <p class="text-slate-400 text-xs mt-1">Grid Logic</p>
+                    </div>
+                    <div onclick="window.openGenericGame('Roulette')" class="glass-panel p-4 rounded-xl hover:-translate-y-1 transition-transform cursor-pointer border-t-4 border-t-red-600">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="p-2 bg-red-500/20 rounded-lg text-red-500"><i data-lucide="disc" class="w-6 h-6"></i></div>
+                        </div>
+                        <h3 class="font-bold text-lg">Roulette</h3>
+                        <p class="text-slate-400 text-xs mt-1">Red or Black</p>
+                    </div>
+                    <div onclick="window.openGenericGame('CoinFlip')" class="glass-panel p-4 rounded-xl hover:-translate-y-1 transition-transform cursor-pointer border-t-4 border-t-yellow-500">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="p-2 bg-yellow-500/20 rounded-lg text-yellow-500"><i data-lucide="coins" class="w-6 h-6"></i></div>
+                        </div>
+                        <h3 class="font-bold text-lg">Coin Flip</h3>
+                        <p class="text-slate-400 text-xs mt-1">Heads or Tails</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. PVP ARENA VIEW -->
+            <div id="view-arena" class="page-view hidden">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8">
+                    <div>
+                        <h2 class="text-3xl font-bold text-white flex items-center">
+                            <i data-lucide="swords" class="w-8 h-8 mr-3 text-red-500"></i>
+                            PvP Battle Arena
+                        </h2>
+                        <p class="text-slate-400 mt-2">Go head-to-head against real players. Highest dice roll wins the entire pot.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Create Match Column -->
+                    <div class="glass-panel p-6 rounded-2xl h-fit border border-red-500/20 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent pointer-events-none"></div>
+                        <h3 class="font-bold text-lg text-white mb-4 relative z-10">Host a Battle</h3>
+                        <div class="relative z-10">
+                            <label class="text-xs text-slate-400 block mb-2">Wager Amount (Game Cash)</label>
+                            <input type="number" id="battle-amount" class="w-full bg-black/50 border border-white/10 rounded-xl p-4 text-white font-mono focus:border-red-500 outline-none mb-4 transition-colors" placeholder="1000">
+                            <button onclick="window.createBattle()" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-red-900/20">
+                                CREATE LOBBY
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Active Matches Column -->
+                    <div class="lg:col-span-2 space-y-4">
+                        <h3 class="font-bold text-lg text-white mb-2">Open Lobbies</h3>
+                        <div id="arena-list" class="space-y-4">
+                            <!-- Populated by JS -->
+                            <div class="text-center text-slate-500 py-10">Loading arena data...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. MARKET VIEW (Expanded) -->
+            <div id="view-market" class="page-view hidden">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Zenith Exchange</h2>
+                        <p class="text-slate-400 text-sm mt-1">Live crypto and synthetic asset trading.</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="market-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- 4. GAMES HUB VIEW -->
+            <div id="view-games" class="page-view hidden">
+                <div id="game-selection" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- DEDICATED GAME CONTAINERS -->
+                <div id="game-crash" class="active-game hidden w-full max-w-3xl mx-auto">
+                    <div class="flex justify-between items-center mb-4">
+                        <button onclick="window.closeGame()" class="text-slate-400 hover:text-white flex items-center"><i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back</button>
+                        <h2 class="text-xl font-bold text-zenith-danger neon-text">CRASH</h2>
+                    </div>
+                    <div class="glass-panel rounded-2xl overflow-hidden relative">
+                        <canvas id="crash-canvas" class="w-full h-80 bg-slate-900"></canvas>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
+                            <div id="crash-multiplier" class="text-5xl md:text-7xl font-mono font-bold text-white">1.00x</div>
+                            <div id="crash-status" class="text-sm font-bold uppercase tracking-widest mt-2 text-slate-500">Waiting for bets</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 glass-panel p-4 rounded-xl flex gap-4 items-end">
+                        <div class="flex-1">
+                            <label class="text-xs text-slate-400 block mb-2">Bet Amount</label>
+                            <input type="number" id="crash-bet" class="w-full bg-black/30 border border-white/10 rounded-lg p-3 text-white font-mono focus:border-zenith-accent outline-none" value="10">
+                        </div>
+                        <button id="crash-btn" onclick="window.playCrash()" class="flex-1 bg-zenith-success hover:bg-emerald-400 text-white font-bold p-3 rounded-lg transition-colors h-[46px]">PLACE BET</button>
+                    </div>
+                </div>
+
+                <div id="game-mines" class="active-game hidden w-full max-w-2xl mx-auto">
+                    <div class="flex justify-between items-center mb-4">
+                        <button onclick="window.closeGame()" class="text-slate-400 hover:text-white flex items-center"><i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back</button>
+                        <h2 class="text-xl font-bold text-zenith-success neon-text">MINES</h2>
+                    </div>
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="glass-panel p-4 rounded-xl flex-1 order-2 md:order-1">
+                            <div id="mines-grid" class="grid grid-cols-5 gap-2">
+                                <!-- Generated by JS -->
+                            </div>
+                        </div>
+                        <div class="w-full md:w-64 flex flex-col gap-4 order-1 md:order-2">
+                             <div class="glass-panel p-4 rounded-xl">
+                                <label class="text-xs text-slate-400 block mb-2">Bet Amount</label>
+                                <input type="number" id="mines-bet" class="w-full bg-black/30 border border-white/10 rounded-lg p-2 text-white font-mono mb-4" value="10">
+                                <label class="text-xs text-slate-400 block mb-2">Mines Count</label>
+                                <select id="mines-count" class="w-full bg-black/30 border border-white/10 rounded-lg p-2 text-white mb-4">
+                                    <option value="1">1 Mine</option>
+                                    <option value="3" selected>3 Mines</option>
+                                    <option value="5">5 Mines</option>
+                                    <option value="10">10 Mines</option>
+                                </select>
+                                <button id="mines-start-btn" onclick="window.startMines()" class="w-full bg-zenith-accent p-3 rounded-lg font-bold">Start Game</button>
+                                <button id="mines-cashout-btn" onclick="window.cashoutMines()" class="w-full bg-zenith-success p-3 rounded-lg font-bold mt-2 hidden">Cashout (<span id="mines-reward">0</span>)</button>
+                             </div>
+                             <div class="glass-panel p-4 rounded-xl text-center">
+                                 <div class="text-xs text-slate-400">Next Multiplier</div>
+                                 <div id="mines-next-mult" class="text-xl font-bold text-zenith-gold">1.13x</div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="game-slots" class="active-game hidden w-full max-w-xl mx-auto">
+                    <div class="flex justify-between items-center mb-4">
+                        <button onclick="window.closeGame()" class="text-slate-400 hover:text-white flex items-center"><i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back</button>
+                        <h2 class="text-xl font-bold text-purple-500 neon-text">NEON SLOTS</h2>
+                    </div>
+                    <div class="glass-panel p-8 rounded-2xl border-2 border-purple-500/20 bg-black/40">
+                         <div class="flex justify-center gap-2 mb-8 bg-black/50 p-4 rounded-xl border border-white/5 relative overflow-hidden">
+                             <div id="slot-1" class="w-20 h-24 bg-zenith-800 rounded flex items-center justify-center text-4xl border border-white/10">🍒</div>
+                             <div id="slot-2" class="w-20 h-24 bg-zenith-800 rounded flex items-center justify-center text-4xl border border-white/10">💎</div>
+                             <div id="slot-3" class="w-20 h-24 bg-zenith-800 rounded flex items-center justify-center text-4xl border border-white/10">7️⃣</div>
+                             <div class="absolute inset-0 pointer-events-none shadow-[inset_0_0_20px_rgba(0,0,0,0.8)]"></div>
+                         </div>
+                         <div class="flex gap-4 items-end">
+                            <div class="flex-1">
+                                <label class="text-xs text-slate-400 block mb-2">Bet Amount</label>
+                                <input type="number" id="slots-bet" class="w-full bg-black/30 border border-white/10 rounded-lg p-3 text-white font-mono" value="50">
+                            </div>
+                            <button onclick="window.spinSlots()" class="flex-[2] bg-purple-600 hover:bg-purple-500 text-white font-bold p-3 rounded-lg transition-colors h-[46px] shadow-lg shadow-purple-900/50">SPIN</button>
+                        </div>
+                        <div id="slots-msg" class="text-center mt-4 h-6 text-sm font-bold text-zenith-gold"></div>
+                    </div>
+                </div>
+
+                 <div id="game-blackjack" class="active-game hidden w-full max-w-3xl mx-auto">
+                    <div class="flex justify-between items-center mb-4">
+                        <button onclick="window.closeGame()" class="text-slate-400 hover:text-white flex items-center"><i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back</button>
+                        <h2 class="text-xl font-bold text-zenith-gold neon-text">BLACKJACK</h2>
+                    </div>
+                    <div class="glass-panel rounded-2xl p-6 min-h-[400px] flex flex-col justify-between relative bg-green-900/10">
+                        <div class="text-center">
+                            <div class="text-xs text-slate-400 mb-2">Dealer <span id="dealer-score" class="ml-2 bg-black/40 px-2 rounded">0</span></div>
+                            <div id="dealer-hand" class="flex justify-center gap-[-10px] h-24"></div>
+                        </div>
+                        <div id="bj-result" class="absolute inset-0 flex items-center justify-center bg-black/60 z-10 hidden backdrop-blur-sm rounded-2xl">
+                            <div class="text-center">
+                                <h2 id="bj-result-text" class="text-3xl font-bold text-white mb-2">YOU WIN</h2>
+                                <button onclick="window.resetBlackjack()" class="bg-white text-black px-6 py-2 rounded-full font-bold hover:bg-slate-200">Play Again</button>
+                            </div>
+                        </div>
+                        <div class="text-center mt-8">
+                            <div id="player-hand" class="flex justify-center gap-[-10px] h-24 mb-4"></div>
+                            <div class="text-xs text-slate-400 mb-2">You <span id="player-score" class="ml-2 bg-black/40 px-2 rounded">0</span></div>
+                        </div>
+                    </div>
+                    <div class="mt-4 glass-panel p-4 rounded-xl">
+                        <div id="bj-bet-phase" class="flex gap-4 items-end">
+                            <div class="flex-1">
+                                <label class="text-xs text-slate-400 block mb-2">Bet Amount</label>
+                                <input type="number" id="bj-bet" class="w-full bg-black/30 border border-white/10 rounded-lg p-3 text-white font-mono" value="50">
+                            </div>
+                            <button onclick="window.dealBlackjack()" class="bg-zenith-gold hover:bg-yellow-400 text-black font-bold px-8 py-3 rounded-lg transition-colors">DEAL</button>
+                        </div>
+                        <div id="bj-play-phase" class="hidden flex justify-center gap-4">
+                            <button onclick="window.hitBlackjack()" class="bg-zenith-accent px-8 py-3 rounded-lg font-bold">HIT</button>
+                            <button onclick="window.standBlackjack()" class="bg-slate-600 px-8 py-3 rounded-lg font-bold">STAND</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="game-generic" class="active-game hidden w-full max-w-xl mx-auto">
+                    <div class="flex justify-between items-center mb-4">
+                        <button onclick="window.closeGame()" class="text-slate-400 hover:text-white flex items-center"><i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back</button>
+                        <h2 id="gen-game-title" class="text-xl font-bold text-white neon-text">GAME</h2>
+                    </div>
+                    <div class="glass-panel p-8 rounded-2xl border border-white/10 bg-black/40 text-center relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 pointer-events-none"></div>
+                        
+                        <!-- Visual Display -->
+                        <div class="h-48 flex items-center justify-center mb-6 relative" id="gen-game-container">
+                            <div id="gen-game-display" class="text-6xl font-bold text-white transition-all transform duration-300">?</div>
+                        </div>
+
+                        <div class="flex gap-4 items-end">
+                            <div class="flex-1 text-left">
+                                <label class="text-xs text-slate-400 block mb-2">Bet Amount</label>
+                                <input type="number" id="gen-bet" class="w-full bg-black/30 border border-white/10 rounded-lg p-3 text-white font-mono" value="25">
+                            </div>
+                        </div>
+                        <div id="gen-controls" class="grid grid-cols-2 gap-3 mt-4"></div>
+                        <div id="gen-msg" class="h-6 mt-4 text-sm font-bold text-zenith-gold"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. STORE VIEW -->
+            <div id="view-store" class="page-view hidden">
+                <div class="max-w-4xl mx-auto">
+                    <!-- Ranks -->
+                    <div class="mb-12">
+                        <h2 class="text-2xl font-bold text-white mb-6 flex items-center">
+                            <i data-lucide="crown" class="w-6 h-6 mr-2 text-zenith-gold"></i> 
+                            Premium Memberships
+                        </h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- VIP Rank -->
+                            <div class="glass-panel p-6 rounded-2xl border border-white/5 hover:border-zenith-gold/50 transition-all group relative overflow-hidden">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="p-3 bg-yellow-500/10 rounded-xl text-zenith-gold">
+                                        <i data-lucide="star" class="w-8 h-8"></i>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-xl font-bold text-white">VIP Status</div>
+                                        <div class="text-sm text-slate-400">$10.00 /mo</div>
+                                    </div>
+                                </div>
+                                <ul class="text-sm text-slate-300 space-y-2 mb-6">
+                                    <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-zenith-success"></i> Golden Star Badge</li>
+                                    <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-zenith-success"></i> 5% Store Bonus</li>
+                                    <li class="flex items-center"><i data-lucide="trending-up" class="w-4 h-4 mr-2 text-zenith-gold"></i> <span class="text-white font-bold">Passive: $1,000 / hr</span></li>
+                                    <li class="flex items-center"><i data-lucide="zap" class="w-4 h-4 mr-2 text-zenith-accent"></i> +5% Game Profits</li>
+                                </ul>
+                                <button onclick="window.buyRank('VIP', 10.00)" class="w-full bg-zenith-gold/10 hover:bg-zenith-gold/20 text-zenith-gold border border-zenith-gold/50 py-3 rounded-xl font-bold transition-colors">
+                                    Subscribe to VIP
+                                </button>
+                            </div>
+
+                            <!-- MVP Rank -->
+                            <div class="glass-panel p-6 rounded-2xl border border-white/5 hover:border-red-500/50 transition-all group relative overflow-hidden">
+                                <div class="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">BEST VALUE</div>
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="p-3 bg-red-500/10 rounded-xl text-red-500">
+                                        <i data-lucide="award" class="w-8 h-8"></i>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-xl font-bold text-white">MVP Status</div>
+                                        <div class="text-sm text-slate-400">$20.00 /mo</div>
+                                    </div>
+                                </div>
+                                <ul class="text-sm text-slate-300 space-y-2 mb-6">
+                                    <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-zenith-success"></i> Diamond Badge & Golden Name</li>
+                                    <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-zenith-success"></i> 10% Store Bonus</li>
+                                    <li class="flex items-center"><i data-lucide="trending-up" class="w-4 h-4 mr-2 text-red-400"></i> <span class="text-white font-bold">Passive: $3,000 / hr</span></li>
+                                    <li class="flex items-center"><i data-lucide="zap" class="w-4 h-4 mr-2 text-zenith-accent"></i> +10% Game Profits</li>
+                                </ul>
+                                <button onclick="window.buyRank('MVP', 20.00)" class="w-full bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/50 py-3 rounded-xl font-bold transition-colors">
+                                    Subscribe to MVP
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mb-10">
+                        <h2 class="text-3xl font-bold text-white mb-2">Zenith Creds (ZC)</h2>
+                        <p class="text-slate-400">Purchase ZC to top up your Game Balance.</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Packs -->
+                        <div class="glass-panel p-6 rounded-2xl border border-white/5 hover:border-zenith-accent/50 transition-all group relative overflow-hidden">
+                            <div class="absolute top-0 right-0 bg-white/10 px-3 py-1 rounded-bl-xl text-xs font-bold text-white">Entry Level</div>
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-white transition-colors">
+                                    <i data-lucide="package" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white text-lg">Novice Pack</h3>
+                                    <div class="text-zenith-success font-mono">+5,000 ZC</div>
+                                </div>
+                            </div>
+                            <button onclick="window.buyPack('Novice Pack', 4.99, 5000)" class="w-full bg-white/5 hover:bg-white/10 text-white py-3 rounded-xl font-bold transition-colors border border-white/10 flex justify-between px-4 items-center">
+                                <span>Purchase</span>
+                                <span>$4.99</span>
+                            </button>
+                        </div>
+
+                        <div class="glass-panel p-6 rounded-2xl border border-white/5 hover:border-zenith-accent/50 transition-all group">
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-12 h-12 bg-blue-900/30 rounded-lg flex items-center justify-center text-blue-400">
+                                    <i data-lucide="box" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white text-lg">Starter Pack</h3>
+                                    <div class="text-zenith-success font-mono">+11,000 ZC</div>
+                                </div>
+                            </div>
+                            <button onclick="window.buyPack('Starter Pack', 9.99, 11000)" class="w-full bg-white/5 hover:bg-white/10 text-white py-3 rounded-xl font-bold transition-colors border border-white/10 flex justify-between px-4 items-center">
+                                <span>Purchase</span>
+                                <span>$9.99</span>
+                            </button>
+                        </div>
+
+                        <div class="glass-panel p-6 rounded-2xl border border-white/5 hover:border-zenith-accent/50 transition-all group relative">
+                            <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div class="flex items-center gap-4 mb-6 relative z-10">
+                                <div class="w-12 h-12 bg-indigo-900/30 rounded-lg flex items-center justify-center text-indigo-400">
+                                    <i data-lucide="layers" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white text-lg">Pro Pack</h3>
+                                    <div class="text-zenith-success font-mono">+30,000 ZC</div>
+                                </div>
+                            </div>
+                            <button onclick="window.buyPack('Pro Pack', 24.99, 30000)" class="w-full bg-zenith-accent hover:bg-indigo-500 text-white py-3 rounded-xl font-bold transition-colors shadow-lg shadow-indigo-500/20 flex justify-between px-4 items-center relative z-10">
+                                <span>Purchase</span>
+                                <span>$24.99</span>
+                            </button>
+                        </div>
+
+                        <div class="glass-panel p-6 rounded-2xl border border-white/5 hover:border-zenith-accent/50 transition-all group border-t-4 border-t-purple-500">
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-12 h-12 bg-purple-900/30 rounded-lg flex items-center justify-center text-purple-400">
+                                    <i data-lucide="shield" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white text-lg">Elite Pack</h3>
+                                    <div class="text-zenith-success font-mono">+65,000 ZC</div>
+                                </div>
+                            </div>
+                            <button onclick="window.buyPack('Elite Pack', 49.99, 65000)" class="w-full bg-white/5 hover:bg-white/10 text-white py-3 rounded-xl font-bold transition-colors border border-white/10 flex justify-between px-4 items-center">
+                                <span>Purchase</span>
+                                <span>$49.99</span>
+                            </button>
+                        </div>
+
+                        <div class="glass-panel p-6 rounded-2xl border border-white/5 hover:border-zenith-accent/50 transition-all group border-t-4 border-t-zenith-gold">
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-12 h-12 bg-yellow-900/30 rounded-lg flex items-center justify-center text-zenith-gold">
+                                    <i data-lucide="crown" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white text-lg">Whale Pack</h3>
+                                    <div class="text-zenith-success font-mono">+150,000 ZC</div>
+                                </div>
+                            </div>
+                            <button onclick="window.buyPack('Whale Pack', 99.99, 150000)" class="w-full bg-white/5 hover:bg-white/10 text-white py-3 rounded-xl font-bold transition-colors border border-white/10 flex justify-between px-4 items-center">
+                                <span>Purchase</span>
+                                <span>$99.99</span>
+                            </button>
+                        </div>
+
+                        <div class="glass-panel p-6 rounded-2xl border border-white/5 hover:border-zenith-accent/50 transition-all group border-t-4 border-t-red-500 relative overflow-hidden">
+                            <div class="absolute inset-0 bg-red-500/5 animate-pulse-fast"></div>
+                            <div class="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">BEST VALUE</div>
+                            
+                            <div class="flex items-center gap-4 mb-6 relative z-10">
+                                <div class="w-12 h-12 bg-red-900/30 rounded-lg flex items-center justify-center text-red-500">
+                                    <i data-lucide="gem" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white text-lg">Zenith Pack</h3>
+                                    <div class="text-zenith-success font-mono">+1,000,000 ZC</div>
+                                </div>
+                            </div>
+                            <button onclick="window.buyPack('Zenith Pack', 499.99, 1000000)" class="w-full bg-red-600 hover:bg-red-500 text-white py-3 rounded-xl font-bold transition-colors shadow-lg shadow-red-500/20 flex justify-between px-4 items-center relative z-10">
+                                <span>Purchase</span>
+                                <span>$499.99</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. VAULT VIEW -->
+            <div id="view-vault" class="page-view hidden">
+                <div class="max-w-2xl mx-auto">
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-400">
+                            <i data-lucide="landmark" class="w-8 h-8"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold text-white">The Vault</h2>
+                        <p class="text-slate-400 mt-2">Exchange your premium Zenith Creds (ZC) for playable Game Cash ($).</p>
+                    </div>
+
+                    <div class="glass-panel p-8 rounded-3xl border border-white/5 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent pointer-events-none"></div>
+                        
+                        <!-- Balances -->
+                        <div class="grid grid-cols-2 gap-4 mb-8">
+                            <div class="bg-black/40 p-4 rounded-xl border border-white/5 text-center">
+                                <div class="text-xs text-slate-400 mb-1 uppercase tracking-wider">Zenith Creds</div>
+                                <div class="text-2xl font-mono font-bold text-zenith-gold flex items-center justify-center">
+                                    <span id="vault-zc-bal">0</span> <span class="text-sm ml-1 text-slate-500">ZC</span>
+                                </div>
+                            </div>
+                            <div class="bg-black/40 p-4 rounded-xl border border-white/5 text-center relative overflow-hidden">
+                                <div class="absolute top-0 right-0 w-2 h-full bg-emerald-500/20"></div>
+                                <div class="text-xs text-emerald-400 mb-1 uppercase tracking-wider font-bold">Game Cash</div>
+                                <div class="text-2xl font-mono font-bold text-white"><span class="text-sm mr-1">$</span><span id="vault-cash-bal">0.00</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Exchange Form -->
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm text-slate-300 mb-2">Amount to Exchange</label>
+                                <div class="relative">
+                                    <input type="number" id="vault-exchange-amount" class="w-full bg-black/50 border border-white/10 rounded-xl p-4 text-white font-mono focus:border-emerald-500 outline-none transition-colors" placeholder="Enter ZC amount">
+                                    <div class="absolute right-4 top-1/2 -translate-y-1/2">
+                                        <button onclick="document.getElementById('vault-exchange-amount').value = Math.floor(window.gameState.zcBalance)" class="text-xs bg-white/10 hover:bg-white/20 px-2 py-1 rounded text-slate-300 transition-colors">MAX</button>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between mt-2 text-xs text-slate-500">
+                                    <span>Rate: 1 ZC = $1 Game Cash</span>
+                                    <span>Fee: 0%</span>
+                                </div>
+                            </div>
+
+                            <button onclick="window.exchangeToVault()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-emerald-900/20 flex items-center justify-center group">
+                                <i data-lucide="refresh-cw" class="w-5 h-5 mr-2 group-hover:rotate-180 transition-transform duration-500"></i>
+                                EXCHANGE TO GAME CASH
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. LEADERBOARD VIEW -->
+            <div id="view-leaderboard" class="page-view hidden">
+                <div class="max-w-2xl mx-auto">
+                    <div class="text-center mb-8">
+                        <i data-lucide="crown" class="w-12 h-12 text-zenith-gold mx-auto mb-2"></i>
+                        <h2 class="text-2xl font-bold text-white">Global Elite</h2>
+                        <p class="text-slate-400 text-sm">Top 10 Wealthiest Players</p>
+                    </div>
+                    <div class="glass-panel rounded-xl overflow-hidden">
+                        <table class="w-full text-left">
+                            <thead class="bg-white/5 text-xs uppercase text-slate-400">
+                                <tr>
+                                    <th class="p-4">Rank</th>
+                                    <th class="p-4">Player</th>
+                                    <th class="p-4 text-right">Net Worth</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboard-body" class="divide-y divide-white/5">
+                                <!-- JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- PROFILE MODAL -->
+    <div id="modal-profile" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+        <div class="glass-panel p-6 rounded-2xl w-full max-w-md border border-white/10 relative">
+            <button onclick="window.closeProfile()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            
+            <h2 class="text-xl font-bold text-white mb-6 flex items-center">
+                <i data-lucide="user-cog" class="w-5 h-5 mr-2 text-zenith-accent"></i> Profile Settings
+            </h2>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">User ID</label>
+                    <div class="bg-black/40 p-3 rounded-lg font-mono text-xs text-slate-500 truncate" id="profile-uid">Loading...</div>
+                </div>
+                
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">Display Name</label>
+                    <input type="text" id="profile-username" class="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:border-zenith-accent outline-none transition-colors" placeholder="Enter new name" maxlength="15">
+                </div>
+
+                <div class="bg-white/5 rounded-lg p-3 border border-white/5">
+                    <div class="text-xs text-slate-400 mb-1">Current Membership</div>
+                    <div class="font-bold text-white flex items-center">
+                        <span id="profile-rank-display">Free Tier</span>
+                    </div>
+                </div>
+
+                <div class="mt-4 border-t border-white/10 pt-4" id="google-login-section">
+                    <button onclick="window.linkGoogleAccount()" class="w-full bg-white text-black hover:bg-gray-200 font-bold py-3 rounded-xl transition-all shadow-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-3" viewBox="0 0 48 48">
+                            <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
+                            <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
+                            <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
+                            <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
+                        </svg>
+                        Link Google Account
+                    </button>
+                </div>
+
+                <div id="google-linked-section" class="hidden mt-4 border-t border-white/10 pt-4 text-center">
+                    <div class="text-xs text-slate-400 mb-1">Linked Account</div>
+                    <div class="font-bold text-white flex items-center justify-center bg-black/30 py-2 rounded-lg border border-white/5">
+                        <i data-lucide="check-circle" class="w-4 h-4 text-zenith-success mr-2"></i>
+                        <span id="google-email-display">user@gmail.com</span>
+                    </div>
+                </div>
+
+                <button onclick="window.saveProfile()" class="w-full bg-zenith-accent hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition-all mt-4 shadow-lg shadow-indigo-500/20">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loader -->
+    <div id="loader">
+        <div class="w-12 h-12 border-4 border-zenith-accent border-t-transparent rounded-full animate-spin"></div>
+        <div class="mt-4 font-mono text-zenith-accent tracking-widest text-xs">CONNECTING TO MAINFRAME...</div>
+    </div>
+
+    <!-- FAILSAFE: Force remove loader if it hangs -->
+    <script>
+        setTimeout(() => {
+            const loader = document.getElementById('loader');
+            if (loader && loader.style.display !== 'none') {
+                loader.style.display = 'none';
+                console.log("Loader force-dismissed due to timeout");
+            }
+        }, 3000);
+    </script>
+
+    <!-- Toast Notification -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+
+    <!-- MAIN APP SCRIPT -->
+    <script>
+        // 1. Initialize State Immediately
+        const defaultPortfolio = { 'ZEN': 0, 'VOID': 0, 'GME': 0, 'BTC': 0, 'ETH': 0, 'SOL': 0, 'DOGE': 0, 'PEPE': 0 };
+        window.gameState = {
+            user: null,
+            rank: null,
+            username: "Trader",
+            balance: 1000,
+            zcBalance: 0,
+            portfolio: { ...defaultPortfolio },
+            marketPrices: {
+                'BTC': 65000,
+                'ETH': 3500,
+                'SOL': 150,
+                'ZEN': 50,
+                'VOID': 120,
+                'GME': 15,
+                'DOGE': 0.15,
+                'PEPE': 0.00001
+            },
+            isGoogleLinkedMock: false,
+            mockEmail: ''
+        };
+
+        // --- Global Game Profit Multiplier ---
+        window.applyRankBoost = function(bet, basePayout) {
+            if (basePayout <= bet) return basePayout; // No boost on losses or pushes
+            const profit = basePayout - bet;
+            const rankMult = window.gameState.rank === 'MVP' ? 1.10 : (window.gameState.rank === 'VIP' ? 1.05 : 1.00);
+            return bet + (profit * rankMult);
+        };
+
+        // --- Custom Cursor Logic ---
+        let cursorX = window.innerWidth / 2, cursorY = window.innerHeight / 2;
+        let outlineX = cursorX, outlineY = cursorY;
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorOutline = document.getElementById('cursor-outline');
+
+        // Track mouse
+        document.addEventListener('mousemove', (e) => {
+            document.documentElement.style.setProperty('--x', e.clientX + 'px');
+            document.documentElement.style.setProperty('--y', e.clientY + 'px');
+            
+            cursorX = e.clientX;
+            cursorY = e.clientY;
+            
+            if (cursorDot) {
+                cursorDot.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+            }
+        });
+
+        function animateCursor() {
+            outlineX += (cursorX - outlineX) * 0.2;
+            outlineY += (cursorY - outlineY) * 0.2;
+            if (cursorOutline) {
+                cursorOutline.style.transform = `translate3d(${outlineX}px, ${outlineY}px, 0) translate(-50%, -50%)`;
+            }
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        document.addEventListener('mouseover', (e) => {
+            if (e.target.closest('button') || e.target.closest('a') || e.target.closest('.cursor-pointer') || e.target.closest('input') || e.target.closest('select')) {
+                if(cursorOutline) cursorOutline.classList.add('hover');
+                if(cursorDot) cursorDot.style.backgroundColor = '#10b981';
+                if(cursorDot) cursorDot.style.boxShadow = '0 0 10px #10b981';
+            }
+        });
+        document.addEventListener('mouseout', (e) => {
+            if (e.target.closest('button') || e.target.closest('a') || e.target.closest('.cursor-pointer') || e.target.closest('input') || e.target.closest('select')) {
+                if(cursorOutline) cursorOutline.classList.remove('hover');
+                if(cursorDot) cursorDot.style.backgroundColor = '#6366f1';
+                if(cursorDot) cursorDot.style.boxShadow = '0 0 10px #6366f1';
+            }
+        });
+
+        // 2. UI Helper Functions
+        window.showToast = function(title, msg, type = 'info') {
+            try {
+                const container = document.getElementById('toast-container');
+                if(!container) return;
+                const el = document.createElement('div');
+                el.className = `glass-panel p-4 rounded-lg shadow-lg border-l-4 ${type === 'error' ? 'border-red-500' : 'border-zenith-accent'} min-w-[250px] animate-fade-up`;
+                el.innerHTML = `<div class="font-bold text-sm text-white">${title}</div><div class="text-xs text-slate-400">${msg}</div>`;
+                container.appendChild(el);
+                setTimeout(() => el.remove(), 4000);
+            } catch (e) { console.warn("Toast error", e); }
+        };
+
+        window.switchTab = function(tabId) {
+            document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
+            const view = document.getElementById(`view-${tabId}`);
+            if(view) view.classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active', 'bg-white/5', 'text-white', 'text-red-400', 'bg-red-500/10'));
+            
+            // Highlight active button specifically
+            const activeBtn = document.querySelector(`button[onclick="window.switchTab('${tabId}')"]`);
+            if(activeBtn) {
+                if(tabId === 'arena') {
+                    activeBtn.classList.add('active', 'text-red-400', 'bg-red-500/10');
+                } else {
+                    activeBtn.classList.add('active', 'bg-white/5', 'text-white');
+                }
+            }
+
+            const titles = { 'dashboard': 'Dashboard', 'games': 'Games Hub', 'arena': 'PvP Arena', 'market': 'Markets', 'leaderboard': 'Leaderboard', 'store': 'Store', 'vault': 'The Vault' };
+            const titleEl = document.getElementById('page-title');
+            if(titleEl) titleEl.innerText = titles[tabId] || 'ZenithPrime';
+            
+            if(tabId === 'games') {
+                if (window.closeGame) {
+                    window.closeGame();
+                }
+                if(document.getElementById('game-selection').children.length === 0) {
+                     window.populateGamesGrid();
+                }
+            }
+            
+            if(tabId === 'vault') window.updateUI();
+        };
+
+        // --- Profile Logic ---
+        window.openProfile = function() {
+            const modal = document.getElementById('modal-profile');
+            if(modal) modal.classList.remove('hidden');
+            
+            if(window.gameState.user) {
+                const uidEl = document.getElementById('profile-uid');
+                if(uidEl) uidEl.innerText = window.gameState.user.uid;
+                
+                // Google Account UI Check (incorporating mock flag for previews)
+                const isGoogleLinked = window.gameState.isGoogleLinkedMock || (window.gameState.user.providerData && window.gameState.user.providerData.some(p => p.providerId === 'google.com'));
+                const gLogin = document.getElementById('google-login-section');
+                const gLinked = document.getElementById('google-linked-section');
+                const gEmail = document.getElementById('google-email-display');
+                
+                if (isGoogleLinked) {
+                    if (gLogin) gLogin.classList.add('hidden');
+                    if (gLinked) gLinked.classList.remove('hidden');
+                    if (gEmail) gEmail.innerText = window.gameState.mockEmail || window.gameState.user.email || 'Linked to Google';
+                } else {
+                    if (gLogin) gLogin.classList.remove('hidden');
+                    if (gLinked) gLinked.classList.add('hidden');
+                }
+            }
+            
+            const nameInput = document.getElementById('profile-username');
+            if(nameInput && window.gameState.username) {
+                nameInput.value = window.gameState.username.replace(/Trader_..../, ''); 
+                if(window.gameState.username.includes('Trader_')) nameInput.value = '';
+                nameInput.placeholder = window.gameState.username;
+            }
+
+            const rankEl = document.getElementById('profile-rank-display');
+            if(rankEl) {
+                if (window.gameState.rank === 'MVP') rankEl.innerHTML = '<span class="text-red-500 flex items-center"><i data-lucide="award" class="w-4 h-4 mr-2"></i> MVP Status</span>';
+                else if (window.gameState.rank === 'VIP') rankEl.innerHTML = '<span class="text-zenith-gold flex items-center"><i data-lucide="star" class="w-4 h-4 mr-2"></i> VIP Status</span>';
+                else rankEl.innerText = "Free Tier";
+                
+                if(window.lucide) window.lucide.createIcons();
+            }
+        };
+
+        window.closeProfile = function() {
+            const modal = document.getElementById('modal-profile');
+            if(modal) modal.classList.add('hidden');
+        };
+
+        window.saveProfile = function() {
+            const nameInput = document.getElementById('profile-username');
+            const newName = nameInput.value.trim();
+            
+            if(newName.length < 3) return window.showToast('Error', 'Name too short (min 3 chars)', 'error');
+            if(newName.length > 15) return window.showToast('Error', 'Name too long (max 15 chars)', 'error');
+            
+            window.gameState.username = newName;
+            window.showToast('Success', 'Profile Updated', 'success');
+            window.closeProfile();
+            
+            if(window.syncBalance) window.syncBalance();
+        };
+
+        // --- PVP ARENA LOGIC ---
+        window.handledMatches = new Set();
+        window.activeMatches = [];
+
+        window.renderArena = function(matches) {
+            window.activeMatches = matches;
+            const container = document.getElementById('arena-list');
+            if (!container) return;
+            
+            let html = '';
+            // Only show waiting matches or recently resolved ones
+            const displayMatches = matches.filter(m => m.status === 'waiting').sort((a,b) => b.amount - a.amount);
+            
+            if (displayMatches.length === 0) {
+                html = '<div class="glass-panel p-8 rounded-xl text-center text-slate-500">No active battles. Be the first to host one!</div>';
+            }
+
+            displayMatches.forEach(m => {
+                const isMine = window.gameState.user && m.creator.uid === window.gameState.user.uid;
+                
+                let rankBadge = '';
+                if (m.creator.rank === 'MVP') rankBadge = '💎';
+                else if (m.creator.rank === 'VIP') rankBadge = '⭐';
+                
+                const btnHtml = isMine 
+                    ? `<button onclick="window.cancelBattle('${m.id}', ${m.amount})" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-6 py-2 rounded-lg transition-colors">CANCEL</button>`
+                    : `<button onclick="window.joinBattle('${m.id}', ${m.amount})" class="bg-red-500/20 hover:bg-red-500/40 text-red-500 font-bold px-6 py-2 rounded-lg transition-colors border border-red-500/50">JOIN MATCH</button>`;
+
+                html += `
+                <div class="glass-panel p-4 rounded-xl flex justify-between items-center border-l-4 border-l-red-500 animate-fade-up">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-black/50 rounded-full flex items-center justify-center font-bold text-red-500 text-lg border border-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.2)]">VS</div>
+                        <div>
+                            <div class="text-xs text-slate-400">Host</div>
+                            <div class="font-bold text-white flex items-center gap-1 text-lg">${m.creator.username} <span title="${m.creator.rank}">${rankBadge}</span></div>
+                        </div>
+                    </div>
+                    <div class="text-center hidden md:block">
+                        <div class="text-xs text-slate-400">Total Pot</div>
+                        <div class="font-mono text-2xl text-zenith-success font-bold">$${(m.amount * 2).toLocaleString()}</div>
+                    </div>
+                    <div>
+                        ${btnHtml}
+                    </div>
+                </div>`;
+            });
+            
+            container.innerHTML = html;
+        };
+
+        window.checkMatchResolutions = function(matches) {
+            if (!window.gameState || !window.gameState.user) return;
+            const myUid = window.gameState.user.uid;
+
+            matches.forEach(match => {
+                if (match.status === 'resolved' && !window.handledMatches.has(match.id)) {
+                    window.handledMatches.add(match.id); // Mark handled locally
+                    
+                    const isCreator = match.creator.uid === myUid;
+                    const isJoiner = match.joiner && match.joiner.uid === myUid;
+                    
+                    if (isCreator || isJoiner) {
+                        const opponent = isCreator ? match.joiner.username : match.creator.username;
+                        const myRoll = isCreator ? match.creatorRoll : match.joinerRoll;
+                        const opRoll = isCreator ? match.joinerRoll : match.creatorRoll;
+                        
+                        if (match.winner === myUid) {
+                            const winAmount = match.amount * 2;
+                            window.gameState.balance += winAmount;
+                            window.showToast('⚔️ PVP VICTORY!', `You rolled ${myRoll} vs ${opRoll}. Won $${winAmount.toLocaleString()} against ${opponent}!`, 'success');
+                            window.updateUI();
+                            if (window.syncBalance) window.syncBalance();
+                        } else {
+                            window.showToast('☠️ PVP DEFEAT', `You rolled ${myRoll} vs ${opRoll}. Lost $${match.amount.toLocaleString()} to ${opponent}.`, 'error');
+                        }
+                    }
+                }
+            });
+        };
+
+        window.createBattle = async function() {
+            if (!window.fbAddDoc) return window.showToast('System', 'Connecting to game servers...', 'error');
+            
+            const amount = parseFloat(document.getElementById('battle-amount').value);
+            if (isNaN(amount) || amount < 10) return window.showToast('Error', 'Minimum wager is $10', 'error');
+            if (amount > window.gameState.balance) return window.showToast('Error', 'Insufficient Game Cash', 'error');
+
+            window.gameState.balance -= amount;
+            window.updateUI();
+            if (window.syncBalance) window.syncBalance();
+            document.getElementById('battle-amount').value = '';
+
+            const matchData = {
+                creator: {
+                    uid: window.gameState.user.uid,
+                    username: window.gameState.username,
+                    rank: window.gameState.rank
+                },
+                amount: amount,
+                status: 'waiting',
+                timestamp: Date.now()
+            };
+
+            const matchesRef = window.fbCollection(window.fbDb, 'artifacts', window.appIdRef, 'public', 'data', 'pvp_matches');
+            await window.fbAddDoc(matchesRef, matchData);
+            window.showToast('Arena', 'Lobby created successfully.', 'success');
+        };
+
+        window.joinBattle = async function(matchId, amount) {
+            if (!window.fbUpdateDoc) return;
+            if (amount > window.gameState.balance) return window.showToast('Error', 'Insufficient Game Cash', 'error');
+            
+            window.gameState.balance -= amount;
+            window.updateUI();
+            if (window.syncBalance) window.syncBalance();
+
+            // Simulate dice roll locally for the resolution
+            let cRoll = 0, jRoll = 0;
+            while (cRoll === jRoll) {
+                cRoll = Math.floor(Math.random() * 100) + 1;
+                jRoll = Math.floor(Math.random() * 100) + 1;
+            }
+            
+            const match = window.activeMatches.find(m => m.id === matchId);
+            const winnerUid = jRoll > cRoll ? window.gameState.user.uid : match.creator.uid;
+
+            const matchRef = window.fbDoc(window.fbDb, 'artifacts', window.appIdRef, 'public', 'data', 'pvp_matches', matchId);
+            await window.fbUpdateDoc(matchRef, {
+                status: 'resolved',
+                joiner: {
+                    uid: window.gameState.user.uid,
+                    username: window.gameState.username,
+                    rank: window.gameState.rank
+                },
+                creatorRoll: cRoll,
+                joinerRoll: jRoll,
+                winner: winnerUid,
+                resolvedAt: Date.now()
+            });
+        };
+
+        window.cancelBattle = async function(matchId, amount) {
+            if (!window.fbDeleteDoc) return;
+            window.gameState.balance += amount; // Refund
+            window.updateUI();
+            if (window.syncBalance) window.syncBalance();
+
+            const matchRef = window.fbDoc(window.fbDb, 'artifacts', window.appIdRef, 'public', 'data', 'pvp_matches', matchId);
+            await window.fbDeleteDoc(matchRef);
+            window.showToast('Arena', 'Match cancelled, wager refunded.', 'info');
+        };
+
+        // --- Games List Configuration ---
+        const gamesList = [
+            { id: 'crash', name: 'Crash', icon: 'trending-up', color: 'text-red-500', bg: 'bg-red-500/20', desc: 'Multipliers', type: 'custom' },
+            { id: 'mines', name: 'Mines', icon: 'bomb', color: 'text-green-500', bg: 'bg-green-500/20', desc: 'Grid Logic', type: 'custom' },
+            { id: 'blackjack', name: 'Blackjack', icon: 'club', color: 'text-yellow-500', bg: 'bg-yellow-500/20', desc: 'Table Game', type: 'custom' },
+            { id: 'slots', name: 'Slots', icon: 'gem', color: 'text-purple-500', bg: 'bg-purple-500/20', desc: 'Jackpot', type: 'custom' },
+            { id: 'CoinFlip', name: 'Coin Flip', icon: 'coins', color: 'text-yellow-400', bg: 'bg-yellow-400/20', desc: 'Heads/Tails', type: 'generic' },
+            { id: 'Roulette', name: 'Roulette', icon: 'disc', color: 'text-red-600', bg: 'bg-red-600/20', desc: 'Red/Black', type: 'generic' },
+            { id: 'Dice', name: 'Dice', icon: 'box', color: 'text-blue-400', bg: 'bg-blue-400/20', desc: 'Roll High', type: 'generic' },
+            { id: 'Keno', name: 'Keno', icon: 'grid', color: 'text-teal-400', bg: 'bg-teal-400/20', desc: 'Lottery', type: 'generic' },
+            { id: 'Plinko', name: 'Plinko', icon: 'arrow-down', color: 'text-pink-500', bg: 'bg-pink-500/20', desc: 'Peg Drop', type: 'generic' },
+            { id: 'Limbo', name: 'Limbo', icon: 'rocket', color: 'text-orange-500', bg: 'bg-orange-500/20', desc: 'Target X', type: 'generic' },
+            { id: 'HiLo', name: 'Hi-Lo', icon: 'layers', color: 'text-indigo-400', bg: 'bg-indigo-400/20', desc: 'High or Low', type: 'generic' },
+            { id: 'Baccarat', name: 'Baccarat', icon: 'credit-card', color: 'text-rose-400', bg: 'bg-rose-400/20', desc: 'P vs B', type: 'generic' },
+            { id: 'Wheel', name: 'Wheel', icon: 'pie-chart', color: 'text-cyan-400', bg: 'bg-cyan-400/20', desc: 'Spin Win', type: 'generic' },
+            { id: 'Diamonds', name: 'Diamonds', icon: 'diamond', color: 'text-blue-300', bg: 'bg-blue-300/20', desc: 'Match Gems', type: 'generic' },
+            { id: 'Tower', name: 'Tower', icon: 'align-justify', color: 'text-emerald-400', bg: 'bg-emerald-400/20', desc: 'Climb Up', type: 'generic' },
+            { id: 'Lottery', name: 'Lottery', icon: 'ticket', color: 'text-amber-400', bg: 'bg-amber-400/20', desc: 'Jackpot', type: 'generic' },
+            { id: 'RPS', name: 'RPS', icon: 'scissors', color: 'text-slate-300', bg: 'bg-slate-300/20', desc: 'Rock Paper', type: 'generic' },
+            { id: 'Scratch', name: 'Scratch', icon: 'eraser', color: 'text-lime-400', bg: 'bg-lime-400/20', desc: 'Reveal', type: 'generic' },
+            { id: 'Poker', name: 'Video Poker', icon: 'spade', color: 'text-red-400', bg: 'bg-red-400/20', desc: 'Draw 5', type: 'generic' },
+            { id: 'Horse', name: 'Derby', icon: 'move', color: 'text-stone-400', bg: 'bg-stone-400/20', desc: 'Race', type: 'generic' },
+            { id: 'Penalty', name: 'Penalty', icon: 'target', color: 'text-blue-600', bg: 'bg-blue-600/20', desc: 'Shoot', type: 'generic' },
+            { id: 'Slide', name: 'Slide', icon: 'sliders', color: 'text-fuchsia-400', bg: 'bg-fuchsia-400/20', desc: 'Multiplier', type: 'generic' },
+            { id: 'Bowling', name: 'Bowling', icon: 'circle', color: 'text-gray-200', bg: 'bg-gray-500/20', desc: 'Strike', type: 'generic' }
+        ];
+
+        window.populateGamesGrid = function() {
+            const container = document.getElementById('game-selection');
+            if(!container) return;
+            
+            let html = '';
+            gamesList.forEach(g => {
+                const func = g.type === 'custom' ? `window.openGame('${g.id}')` : `window.openGenericGame('${g.id}')`;
+                const borderColor = g.color.replace('text-', 'border-t-');
+                
+                html += `
+                <div onclick="${func}" class="glass-panel p-4 rounded-xl hover:-translate-y-1 transition-transform cursor-pointer group border-t-4 ${borderColor}">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-2 ${g.bg} rounded-lg ${g.color}"><i data-lucide="${g.icon}" class="w-6 h-6"></i></div>
+                    </div>
+                    <h3 class="font-bold text-lg text-white">${g.name}</h3>
+                    <p class="text-slate-400 text-xs mt-1">${g.desc}</p>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+            if(window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+        };
+
+        // --- Universal Game Engine ---
+        let currentGenericGame = null;
+
+        // Custom Game Hook that was missing
+        window.openGame = function(gameId) {
+            window.switchTab('games');
+            const selection = document.getElementById('game-selection');
+            if(selection) selection.classList.add('hidden');
+            document.querySelectorAll('.active-game').forEach(g => g.classList.add('hidden'));
+            const gameEl = document.getElementById(`game-${gameId}`);
+            if(gameEl) gameEl.classList.remove('hidden');
+            if(gameId === 'mines') window.initMines();
+            if(gameId === 'blackjack') window.resetBlackjack();
+        };
+
+        window.openGenericGame = function(gameId) {
+            window.switchTab('games');
+            const selection = document.getElementById('game-selection');
+            if(selection) selection.classList.add('hidden');
+            
+            const modal = document.getElementById('game-generic');
+            if(modal) modal.classList.remove('hidden');
+            
+            const titleEl = document.getElementById('gen-game-title');
+            if(titleEl) titleEl.innerText = gameId.toUpperCase();
+            
+            const display = document.getElementById('gen-game-display');
+            if(display) display.innerHTML = getInitialVisual(gameId);
+            
+            const msg = document.getElementById('gen-msg');
+            if(msg) msg.innerText = "";
+            
+            const controls = document.getElementById('gen-controls');
+            if(controls) {
+                controls.innerHTML = ''; 
+                controls.className = "grid grid-cols-2 gap-3 mt-4"; 
+
+                if (gameId === 'CoinFlip') {
+                    controls.innerHTML = `
+                        <button onclick="window.playGenericRound('Heads', 2)" class="bg-yellow-500/20 hover:bg-yellow-500/40 text-yellow-500 py-4 rounded-xl font-bold border border-yellow-500/50">HEADS</button>
+                        <button onclick="window.playGenericRound('Tails', 2)" class="bg-gray-500/20 hover:bg-gray-500/40 text-gray-300 py-4 rounded-xl font-bold border border-gray-500/50">TAILS</button>
+                    `;
+                } else if (gameId === 'Roulette') {
+                    controls.className = "grid grid-cols-3 gap-2 mt-4";
+                    controls.innerHTML = `
+                        <button onclick="window.playGenericRound('Red', 2)" class="bg-red-600 hover:bg-red-500 text-white py-4 rounded-xl font-bold">RED (2x)</button>
+                        <button onclick="window.playGenericRound('Green', 14)" class="bg-green-600 hover:bg-green-500 text-white py-4 rounded-xl font-bold">ZERO (14x)</button>
+                        <button onclick="window.playGenericRound('Black', 2)" class="bg-zinc-800 hover:bg-zinc-700 text-white py-4 rounded-xl font-bold">BLACK (2x)</button>
+                    `;
+                } else if (gameId === 'RPS') {
+                    controls.className = "grid grid-cols-3 gap-2 mt-4";
+                    controls.innerHTML = `
+                        <button onclick="window.playGenericRound('Rock', 3)" class="bg-slate-700 hover:bg-slate-600 text-white py-4 rounded-xl font-bold">ROCK</button>
+                        <button onclick="window.playGenericRound('Paper', 3)" class="bg-slate-700 hover:bg-slate-600 text-white py-4 rounded-xl font-bold">PAPER</button>
+                        <button onclick="window.playGenericRound('Scissors', 3)" class="bg-slate-700 hover:bg-slate-600 text-white py-4 rounded-xl font-bold">SCISSORS</button>
+                    `;
+                } else if (gameId === 'Baccarat' || gameId === 'HiLo') {
+                    const opts = gameId === 'Baccarat' ? ['PLAYER', 'TIE', 'BANKER'] : ['LOW', 'DRAW', 'HIGH'];
+                    const mults = gameId === 'Baccarat' ? [2, 8, 1.95] : [2, 10, 2];
+                    controls.className = "grid grid-cols-3 gap-2 mt-4";
+                    controls.innerHTML = `
+                        <button onclick="window.playGenericRound('${opts[0]}', ${mults[0]})" class="bg-blue-600 hover:bg-blue-500 text-white py-4 rounded-xl font-bold">${opts[0]}</button>
+                        <button onclick="window.playGenericRound('${opts[1]}', ${mults[1]})" class="bg-yellow-600 hover:bg-yellow-500 text-white py-4 rounded-xl font-bold">${opts[1]}</button>
+                        <button onclick="window.playGenericRound('${opts[2]}', ${mults[2]})" class="bg-red-600 hover:bg-red-500 text-white py-4 rounded-xl font-bold">${opts[2]}</button>
+                    `;
+                } else {
+                    controls.className = "grid grid-cols-1 mt-4";
+                    controls.innerHTML = `
+                        <button onclick="window.playGenericRound('Play', 2)" class="bg-zenith-accent hover:bg-indigo-500 text-white py-4 rounded-xl font-bold">PLAY ROUND</button>
+                    `;
+                }
+            }
+            
+            currentGenericGame = gameId;
+        };
+
+        function getInitialVisual(gameId) {
+            if (gameId === 'CoinFlip') return '<div class="w-32 h-32 rounded-full bg-yellow-500 border-4 border-yellow-300 flex items-center justify-center text-5xl shadow-lg">?</div>';
+            if (gameId === 'Roulette' || gameId === 'Wheel') return '<div class="w-32 h-32 rounded-full border-8 border-white/20 border-t-red-500 animate-spin-slow"></div>';
+            if (gameId === 'Dice') return '<div class="w-24 h-24 bg-white rounded-xl text-black flex items-center justify-center text-6xl font-bold shadow-lg">🎲</div>';
+            if (gameId === 'RPS') return '<div class="flex gap-4"><div class="text-6xl">🤜</div><div class="text-6xl">🤛</div></div>';
+            if (gameId === 'Limbo' || gameId === 'Rocket') return '<div class="text-6xl">🚀</div>';
+            if (gameId === 'Keno' || gameId === 'Lottery') return '<div class="grid grid-cols-4 gap-1 p-2 bg-white/5 rounded">{GRID}</div>'.replace('{GRID}', Array(16).fill('<div class="w-4 h-4 bg-white/10 rounded-full"></div>').join(''));
+            if (gameId === 'Baccarat' || gameId === 'Poker' || gameId === 'HiLo') return '<div class="flex gap-2"><div class="w-16 h-24 bg-blue-700 rounded border border-white/20"></div><div class="w-16 h-24 bg-red-700 rounded border border-white/20"></div></div>';
+            if (gameId === 'Plinko') return '<div class="flex flex-col items-center"><div class="w-4 h-4 bg-pink-500 rounded-full mb-2"></div><div class="flex gap-1"><div class="w-2 h-2 bg-white rounded-full"></div><div class="w-2 h-2 bg-white rounded-full"></div><div class="w-2 h-2 bg-white rounded-full"></div></div></div>';
+            return '<div class="text-6xl font-bold text-white">?</div>';
+        }
+
+        window.playGenericRound = function(choice, multiplier) {
+            const betInput = document.getElementById('gen-bet');
+            const bet = parseFloat(betInput ? betInput.value : 0);
+            
+            if (bet > window.gameState.balance) return window.showToast('Error', 'Insufficient Funds', 'error');
+            
+            window.gameState.balance -= bet;
+            window.updateUI();
+            
+            const display = document.getElementById('gen-game-display');
+            const msg = document.getElementById('gen-msg');
+            if(msg) msg.innerText = "Running...";
+            
+            if(display) {
+                if (currentGenericGame === 'CoinFlip') {
+                    display.innerHTML = '<div class="w-32 h-32 rounded-full bg-yellow-500 border-4 border-yellow-300 flex items-center justify-center text-5xl shadow-lg visual-coin">🪙</div>';
+                } else if (currentGenericGame === 'Dice') {
+                    display.innerHTML = '<div class="w-24 h-24 bg-white rounded-xl text-black flex items-center justify-center text-6xl font-bold shadow-lg visual-shake">🎲</div>';
+                } else if (currentGenericGame === 'Roulette' || currentGenericGame === 'Wheel') {
+                    display.innerHTML = '<div class="w-32 h-32 rounded-full border-8 border-white/20 border-t-red-500 visual-spin"></div>';
+                } else if (currentGenericGame === 'Limbo') {
+                    display.innerHTML = '<div class="text-6xl visual-rocket">🚀</div>';
+                } else if (currentGenericGame === 'RPS') {
+                    display.innerHTML = '<div class="flex gap-4"><div class="text-6xl visual-shake">🤜</div><div class="text-6xl visual-shake" style="animation-delay:0.1s">🤛</div></div>';
+                }
+            }
+            
+            setTimeout(() => {
+                let win = false;
+                let resultHTML = "";
+                let payoutMult = multiplier;
+
+                if (currentGenericGame === 'CoinFlip') {
+                    const res = Math.random() > 0.5 ? 'Heads' : 'Tails';
+                    resultHTML = `<div class="w-32 h-32 rounded-full ${res === 'Heads' ? 'bg-yellow-500' : 'bg-gray-400'} border-4 border-white flex items-center justify-center text-2xl font-bold text-black shadow-lg">${res}</div>`;
+                    win = (res === choice);
+                } 
+                else if (currentGenericGame === 'Roulette') {
+                    const r = Math.random();
+                    let color = 'Black';
+                    if (r < 0.05) color = 'Green';
+                    else if (r < 0.525) color = 'Red';
+                    const colorClass = color === 'Red' ? 'bg-red-600' : (color === 'Green' ? 'bg-green-600' : 'bg-zinc-800');
+                    resultHTML = `<div class="w-32 h-32 rounded-full ${colorClass} border-4 border-white flex items-center justify-center text-2xl font-bold text-white shadow-lg">${color}</div>`;
+                    win = (color === choice);
+                } 
+                else if (currentGenericGame === 'Dice') {
+                    const roll = Math.floor(Math.random() * 6) + 1;
+                    resultHTML = `<div class="w-24 h-24 bg-white rounded-xl text-black flex items-center justify-center text-6xl font-bold shadow-lg">${roll}</div>`;
+                    win = roll > 3; 
+                }
+                else if (currentGenericGame === 'RPS') {
+                    const opts = ['Rock', 'Paper', 'Scissors'];
+                    const icons = {'Rock':'🪨', 'Paper':'📄', 'Scissors':'✂️'};
+                    const cpu = opts[Math.floor(Math.random() * 3)];
+                    
+                    resultHTML = `<div class="flex gap-4 items-center"><div class="text-4xl text-slate-400">YOU<br>${icons[choice]}</div><div class="text-2xl">VS</div><div class="text-4xl text-red-400">CPU<br>${icons[cpu]}</div></div>`;
+                    
+                    if (choice === cpu) {
+                        window.gameState.balance += bet; 
+                        if(msg) { msg.innerText = "DRAW - Refunded"; msg.className = "h-6 mt-4 text-sm font-bold text-white"; }
+                        window.updateUI(); return;
+                    }
+                    if ((choice === 'Rock' && cpu === 'Scissors') || (choice === 'Paper' && cpu === 'Rock') || (choice === 'Scissors' && cpu === 'Paper')) win = true;
+                }
+                else if (currentGenericGame === 'Limbo') {
+                    const crash = (Math.random() * 10).toFixed(2);
+                    const crashed = Math.random() > 0.4;
+                    const finalVal = crashed ? 1.00 : crash;
+                    const color = finalVal > 1.5 ? 'text-green-500' : 'text-red-500';
+                    resultHTML = `<div class="text-6xl font-mono font-bold ${color}">${finalVal}x</div>`;
+                    win = finalVal > 1.5;
+                }
+                else if (currentGenericGame === 'Baccarat' || currentGenericGame === 'HiLo') {
+                    const pVal = Math.floor(Math.random() * 9) + 1;
+                    const bVal = Math.floor(Math.random() * 9) + 1;
+                    resultHTML = `<div class="flex gap-4"><div class="w-16 h-24 bg-white text-black rounded flex items-center justify-center font-bold text-xl border-2 border-blue-500">${pVal}</div><div class="w-16 h-24 bg-white text-black rounded flex items-center justify-center font-bold text-xl border-2 border-red-500">${bVal}</div></div>`;
+                    
+                    if (currentGenericGame === 'Baccarat') {
+                        if (choice === 'TIE' && pVal === bVal) win = true;
+                        else if (choice === 'PLAYER' && pVal > bVal) win = true;
+                        else if (choice === 'BANKER' && bVal > pVal) win = true;
+                    } else {
+                        if (choice === 'HIGH' && (pVal + bVal > 10)) win = true;
+                        else if (choice === 'LOW' && (pVal + bVal <= 10)) win = true;
+                        else if (choice === 'DRAW') win = Math.random() > 0.8;
+                    }
+                }
+                else {
+                    win = Math.random() > 0.55; 
+                    resultHTML = win ? '<div class="text-6xl text-green-500">WIN</div>' : '<div class="text-6xl text-red-500">LOSS</div>';
+                }
+                
+                if (display) display.innerHTML = resultHTML;
+                
+                if (win) {
+                    const basePayout = bet * payoutMult;
+                    const finalPayout = window.applyRankBoost(bet, basePayout);
+                    window.gameState.balance += finalPayout;
+                    
+                    const isBoosted = finalPayout > basePayout;
+                    window.showToast('WINNER', `Won $${finalPayout.toFixed(2)}${isBoosted ? ' (+Rank Bonus)' : ''}`, 'success');
+                    
+                    if(msg) {
+                        msg.innerText = `WON $${finalPayout.toFixed(2)}`;
+                        msg.className = "h-6 mt-4 text-sm font-bold text-zenith-success";
+                    }
+                } else {
+                    if(msg) {
+                        msg.innerText = "TRY AGAIN";
+                        msg.className = "h-6 mt-4 text-sm font-bold text-slate-500";
+                    }
+                }
+                
+                window.updateUI();
+                if(window.syncBalance) window.syncBalance();
+            }, 1000);
+        };
+
+        window.updateUI = function() {
+            if (!window.gameState) return;
+
+            const balEl = document.getElementById('ui-balance');
+            if (balEl) balEl.innerText = window.gameState.balance.toFixed(2);
+            
+            const zcBalEl = document.getElementById('ui-zc-balance');
+            if (zcBalEl) zcBalEl.innerText = Math.floor(window.gameState.zcBalance || 0).toLocaleString();
+            
+            const nwEl = document.getElementById('dash-networth');
+            if (nwEl) nwEl.innerText = window.gameState.balance.toFixed(2);
+            
+            const vaultZc = document.getElementById('vault-zc-bal');
+            if(vaultZc) vaultZc.innerText = Math.floor(window.gameState.zcBalance || 0).toLocaleString();
+            
+            const vaultCash = document.getElementById('vault-cash-bal');
+            if(vaultCash) vaultCash.innerText = window.gameState.balance.toFixed(2);
+            
+            // Render specific highlighted market coins in dashboard
+            if(window.gameState.marketPrices) {
+                const btcEl = document.getElementById('dash-btc');
+                if(btcEl) btcEl.innerText = `$${(window.gameState.marketPrices['BTC'] || 0).toFixed(2)}`;
+                
+                const zenEl = document.getElementById('dash-zen');
+                if(zenEl) zenEl.innerText = `$${(window.gameState.marketPrices['ZEN'] || 0).toFixed(2)}`;
+            }
+
+            window.renderMarket();
+        };
+
+        // --- EXPANDED MARKET CONFIG ---
+        const marketCoinsList = [
+            { ticker: 'BTC', name: 'Bitcoin', color: 'text-orange-400' },
+            { ticker: 'ETH', name: 'Ethereum', color: 'text-blue-300' },
+            { ticker: 'SOL', name: 'Solana', color: 'text-purple-300' },
+            { ticker: 'DOGE', name: 'Dogecoin', color: 'text-yellow-200' },
+            { ticker: 'ZEN', name: 'Zenith Coin', color: 'text-zenith-gold' },
+            { ticker: 'VOID', name: 'Void Protocol', color: 'text-purple-500' },
+            { ticker: 'GME', name: 'GambleStop', color: 'text-red-400' },
+            { ticker: 'PEPE', name: 'Pepe', color: 'text-green-400' }
+        ];
+
+        window.renderMarket = function() {
+            if (!window.gameState || !window.gameState.marketPrices) return;
+
+            const grid = document.getElementById('market-grid');
+            if (!grid) return;
+            
+            grid.innerHTML = '';
+            
+            marketCoinsList.forEach(c => {
+                const price = window.gameState.marketPrices[c.ticker] || 0;
+                const held = (window.gameState.portfolio && window.gameState.portfolio[c.ticker]) || 0;
+                
+                // Format price appropriately for large vs small coins
+                const displayPrice = price < 0.01 ? price.toFixed(6) : price.toFixed(2);
+
+                const card = document.createElement('div');
+                card.className = 'glass-panel p-6 rounded-2xl flex flex-col justify-between h-full';
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-bold text-white text-lg">${c.name}</h3>
+                                <span class="text-xs text-slate-400 font-mono">${c.ticker}</span>
+                            </div>
+                            <div class="font-mono text-xl ${c.color}">$${displayPrice}</div>
+                        </div>
+                        <div class="bg-black/20 rounded-lg p-3 mb-4 flex justify-between items-center">
+                            <span class="text-xs text-slate-400">Holdings</span>
+                            <span class="font-mono font-bold">${held} ${c.ticker}</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 mt-auto">
+                        <button onclick="window.trade('${c.ticker}', 'buy')" class="flex-[2] bg-zenith-success/20 hover:bg-zenith-success/30 text-zenith-success py-2 rounded font-bold transition-colors">BUY</button>
+                        <button onclick="window.trade('${c.ticker}', 'sell')" class="flex-1 bg-zenith-danger/20 hover:bg-zenith-danger/30 text-zenith-danger py-2 rounded font-bold transition-colors">SELL</button>
+                        <button onclick="window.trade('${c.ticker}', 'sell_all')" class="flex-1 bg-red-600/30 hover:bg-red-600/50 text-red-500 py-2 rounded font-bold transition-colors text-xs flex items-center justify-center">ALL</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        };
+
+        window.addFunds = function() {
+            window.switchTab('store');
+        };
+
+        window.trade = function(ticker, type) {
+            const price = window.gameState.marketPrices[ticker];
+            
+            if(type === 'buy') {
+                if(window.gameState.balance >= price) {
+                    window.gameState.balance -= price;
+                    window.gameState.portfolio[ticker]++;
+                    window.showToast('Trade Executed', `Bought 1 ${ticker}`, 'success');
+                } else {
+                    window.showToast('Failed', 'Insufficient Funds', 'error');
+                }
+            } else if(type === 'sell') {
+                if(window.gameState.portfolio[ticker] > 0) {
+                    window.gameState.portfolio[ticker]--;
+                    window.gameState.balance += price;
+                    window.showToast('Trade Executed', `Sold 1 ${ticker}`, 'success');
+                } else {
+                    window.showToast('Failed', `No ${ticker} to sell`, 'error');
+                }
+            } else if(type === 'sell_all') {
+                const qty = window.gameState.portfolio[ticker] || 0;
+                if(qty > 0) {
+                    const totalValue = qty * price;
+                    window.gameState.portfolio[ticker] = 0;
+                    window.gameState.balance += totalValue;
+                    window.showToast('Trade Executed', `Sold all ${qty} ${ticker} for $${totalValue.toFixed(2)}`, 'success');
+                } else {
+                    window.showToast('Failed', `No ${ticker} to sell`, 'error');
+                }
+            }
+            window.updateUI();
+            if(window.syncBalance) window.syncBalance();
+        };
+
+        // --- Crash Engine ---
+        let crashRunning = false;
+        let crashMultiplier = 1.00;
+        let crashInterval;
+        
+        window.playCrash = function() {
+            const canvas = document.getElementById('crash-canvas');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            if(crashRunning) {
+                crashRunning = false;
+                clearInterval(crashInterval);
+                const betInput = document.getElementById('crash-bet');
+                const bet = parseFloat(betInput ? betInput.value : 0);
+                
+                const baseWin = bet * crashMultiplier;
+                const win = window.applyRankBoost(bet, baseWin);
+                window.gameState.balance += win;
+                
+                const isBoosted = win > baseWin;
+                window.showToast('WINNER', `You won $${win.toFixed(2)}${isBoosted ? ' (+Bonus)' : ''}`, 'success');
+                
+                const btn = document.getElementById('crash-btn');
+                if(btn) {
+                    btn.innerText = 'PLACE BET';
+                    btn.className = "flex-1 bg-zenith-success hover:bg-emerald-400 text-white font-bold p-3 rounded-lg transition-colors h-[46px]";
+                }
+                
+                const status = document.getElementById('crash-status');
+                if(status) {
+                    status.innerText = `Cashed Out @ ${crashMultiplier.toFixed(2)}x`;
+                    status.className = "text-sm font-bold uppercase tracking-widest mt-2 text-green-500";
+                }
+                
+                window.updateUI();
+                if(window.syncBalance) window.syncBalance();
+                return;
+            }
+
+            const betInput = document.getElementById('crash-bet');
+            const bet = parseFloat(betInput ? betInput.value : 10);
+            if(bet > window.gameState.balance) return window.showToast('Error', 'Insufficient funds', 'error');
+
+            window.gameState.balance -= bet;
+            window.updateUI();
+            
+            crashRunning = true;
+            crashMultiplier = 1.00;
+            
+            const btn = document.getElementById('crash-btn');
+            if(btn) {
+                btn.innerText = 'CASHOUT';
+                btn.className = "flex-1 bg-zenith-gold hover:bg-yellow-400 text-black font-bold p-3 rounded-lg transition-colors h-[46px]";
+            }
+            
+            const status = document.getElementById('crash-status');
+            if(status) {
+                status.innerText = 'RIDING...';
+                status.className = "text-sm font-bold uppercase tracking-widest mt-2 text-zenith-gold";
+            }
+
+            const crashPoint = (0.99 / Math.random()); 
+            let time = 0;
+            
+            crashInterval = setInterval(() => {
+                if(!canvas.isConnected || canvas.offsetWidth === 0) {
+                    clearInterval(crashInterval);
+                    crashRunning = false;
+                    return;
+                }
+                
+                const width = canvas.width = canvas.offsetWidth;
+                const height = canvas.height = canvas.offsetHeight;
+                
+                time += 0.1;
+                crashMultiplier += 0.01 + (time * 0.001);
+                
+                ctx.fillStyle = '#0f172a';
+                ctx.fillRect(0,0, width, height);
+                ctx.beginPath();
+                ctx.moveTo(0, height);
+                
+                let x = (time * 10) % width;
+                if(!isFinite(x)) x = 0;
+                
+                let y = height - (Math.pow(time, 1.5) * 2);
+                if(y < 0) y = 0;
+                
+                ctx.lineTo(x, y);
+                ctx.strokeStyle = '#6366f1';
+                ctx.lineWidth = 4;
+                ctx.stroke();
+
+                const multEl = document.getElementById('crash-multiplier');
+                if(multEl) multEl.innerText = crashMultiplier.toFixed(2) + 'x';
+
+                if(crashMultiplier >= crashPoint) {
+                    crashRunning = false;
+                    clearInterval(crashInterval);
+                    if(status) {
+                        status.innerText = 'CRASHED!';
+                        status.className = "text-sm font-bold uppercase tracking-widest mt-2 text-red-500";
+                    }
+                    if(multEl) {
+                        multEl.classList.add('text-red-500');
+                        multEl.classList.remove('text-white');
+                    }
+                    if(btn) {
+                        btn.innerText = 'PLACE BET';
+                        btn.className = "flex-1 bg-zenith-success hover:bg-emerald-400 text-white font-bold p-3 rounded-lg transition-colors h-[46px]";
+                    }
+                    setTimeout(() => {
+                        if(multEl) {
+                            multEl.classList.remove('text-red-500');
+                            multEl.classList.add('text-white');
+                        }
+                    }, 2000);
+                    if(window.syncBalance) window.syncBalance();
+                }
+            }, 50);
+        };
+
+        // --- Mines Engine ---
+        let minesGame = { active: false, mines: [], revealed: [], bet: 0 };
+        window.initMines = function() {
+            const grid = document.getElementById('mines-grid');
+            if(!grid) return;
+            grid.innerHTML = '';
+            for(let i=0; i<25; i++) {
+                const tile = document.createElement('button');
+                tile.className = 'w-full aspect-square bg-white/5 rounded-lg hover:bg-white/10 transition-colors flex items-center justify-center text-2xl mine-tile';
+                tile.onclick = () => window.clickMine(i);
+                tile.id = `mine-${i}`;
+                grid.appendChild(tile);
+            }
+        };
+
+        window.startMines = function() {
+            const betInput = document.getElementById('mines-bet');
+            const bet = parseFloat(betInput ? betInput.value : 10);
+            if(bet > window.gameState.balance) return window.showToast('Error', 'Insufficient funds', 'error');
+            
+            window.gameState.balance -= bet;
+            window.updateUI();
+
+            minesGame.active = true;
+            minesGame.bet = bet;
+            minesGame.revealed = [];
+            const countInput = document.getElementById('mines-count');
+            const mineCount = parseInt(countInput ? countInput.value : 3);
+            
+            minesGame.mines = [];
+            while(minesGame.mines.length < mineCount) {
+                const r = Math.floor(Math.random() * 25);
+                if(!minesGame.mines.includes(r)) minesGame.mines.push(r);
+            }
+
+            window.initMines();
+            const startBtn = document.getElementById('mines-start-btn');
+            if(startBtn) startBtn.classList.add('hidden');
+            const cashoutBtn = document.getElementById('mines-cashout-btn');
+            if(cashoutBtn) cashoutBtn.classList.remove('hidden');
+            
+            const rewardEl = document.getElementById('mines-reward');
+            if(rewardEl) rewardEl.innerText = bet.toFixed(2);
+            
+            const nextMultEl = document.getElementById('mines-next-mult');
+            if(nextMultEl) nextMultEl.innerText = window.calculateMinesMultiplier(0).toFixed(2) + 'x';
+        };
+
+        window.calculateMinesMultiplier = function(hits) {
+            let m = 0.98;
+            const countInput = document.getElementById('mines-count');
+            const count = parseInt(countInput ? countInput.value : 3);
+            for(let i=0; i<=hits; i++) {
+                m = m * (25 - i) / (25 - count - i);
+            }
+            return 1 / m;
+        };
+
+        window.clickMine = function(idx) {
+            if(!minesGame.active || minesGame.revealed.includes(idx)) return;
+            const tile = document.getElementById(`mine-${idx}`);
+            if(minesGame.mines.includes(idx)) {
+                if(tile) {
+                    tile.classList.add('bg-red-500/50');
+                    tile.innerHTML = '💣';
+                }
+                window.endMines(false);
+            } else {
+                minesGame.revealed.push(idx);
+                if(tile) {
+                    tile.classList.add('bg-green-500/50');
+                    tile.innerHTML = '💎';
+                }
+                const currentMult = 1.05 * Math.pow(1.15, minesGame.revealed.length);
+                const baseWin = minesGame.bet * currentMult;
+                const win = window.applyRankBoost(minesGame.bet, baseWin);
+                
+                const rewardEl = document.getElementById('mines-reward');
+                if(rewardEl) rewardEl.innerText = win.toFixed(2);
+                
+                const nextMultEl = document.getElementById('mines-next-mult');
+                if(nextMultEl) nextMultEl.innerText = (currentMult * 1.15).toFixed(2) + 'x';
+            }
+        };
+
+        window.cashoutMines = function() {
+            if(!minesGame.active) return;
+            const rewardEl = document.getElementById('mines-reward');
+            const currentWin = parseFloat(rewardEl ? rewardEl.innerText : 0);
+            window.gameState.balance += currentWin;
+            
+            const isBoosted = currentWin > minesGame.bet && window.gameState.rank;
+            window.showToast('Nice!', `Won $${currentWin.toFixed(2)}${isBoosted ? ' (+Bonus)' : ''}`, 'success');
+            
+            window.endMines(true);
+        };
+
+        window.endMines = function(win) {
+            minesGame.active = false;
+            const startBtn = document.getElementById('mines-start-btn');
+            if(startBtn) startBtn.classList.remove('hidden');
+            const cashoutBtn = document.getElementById('mines-cashout-btn');
+            if(cashoutBtn) cashoutBtn.classList.add('hidden');
+            
+            minesGame.mines.forEach(idx => {
+                const t = document.getElementById(`mine-${idx}`);
+                if(t) {
+                    t.innerHTML = '💣';
+                    if(!win) t.classList.add('bg-red-500/20');
+                }
+            });
+            window.updateUI();
+            if(window.syncBalance) window.syncBalance();
+        };
+
+        // --- Slots Engine ---
+        window.spinSlots = function() {
+            const betInput = document.getElementById('slots-bet');
+            const bet = parseFloat(betInput ? betInput.value : 50);
+            if(bet > window.gameState.balance) return window.showToast('Error', 'Insufficient funds', 'error');
+            
+            window.gameState.balance -= bet;
+            window.updateUI();
+
+            const icons = ['🍒', '💎', '7️⃣', '🍋', '🍇', '🔔'];
+            const reels = [document.getElementById('slot-1'), document.getElementById('slot-2'), document.getElementById('slot-3')];
+            const msgEl = document.getElementById('slots-msg');
+            if(msgEl) msgEl.innerText = '';
+
+            let iterations = 0;
+            const interval = setInterval(() => {
+                reels.forEach(r => { if(r) r.innerText = icons[Math.floor(Math.random() * icons.length)]; });
+                iterations++;
+                if(iterations > 15) {
+                    clearInterval(interval);
+                    const r1 = icons[Math.floor(Math.random() * icons.length)];
+                    const r2 = icons[Math.floor(Math.random() * icons.length)];
+                    const r3 = icons[Math.floor(Math.random() * icons.length)];
+                    const forceWin = Math.random() > 0.7;
+                    const finalRes = forceWin ? [r1, r1, r1] : [r1, r2, r3];
+
+                    if(reels[0]) reels[0].innerText = finalRes[0];
+                    if(reels[1]) reels[1].innerText = finalRes[1];
+                    if(reels[2]) reels[2].innerText = finalRes[2];
+
+                    if(finalRes[0] === finalRes[1] && finalRes[1] === finalRes[2]) {
+                        const baseWin = bet * 10;
+                        const win = window.applyRankBoost(bet, baseWin);
+                        window.gameState.balance += win;
+                        if(msgEl) msgEl.innerText = `JACKPOT! $${win.toFixed(2)}`;
+                        window.showToast('JACKPOT', `You won $${win.toFixed(2)}`, 'success');
+                    } else if (finalRes[0] === finalRes[1] || finalRes[1] === finalRes[2]) {
+                        const baseWin = bet * 1.5;
+                        const win = window.applyRankBoost(bet, baseWin);
+                        window.gameState.balance += win;
+                        if(msgEl) msgEl.innerText = `Small Win: $${win.toFixed(2)}`;
+                    } else {
+                         if(msgEl) msgEl.innerText = `Try Again`;
+                    }
+                    window.updateUI();
+                    if(window.syncBalance) window.syncBalance();
+                }
+            }, 100);
+        };
+
+        // --- Blackjack Engine ---
+        let bjDeck = [];
+        let bjPlayerHand = [];
+        let bjDealerHand = [];
+        let bjGameActive = false;
+
+        window.getCard = function() {
+            const suits = ['♠', '♥', '♦', '♣'];
+            const values = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+            const v = values[Math.floor(Math.random()*values.length)];
+            let weight = parseInt(v);
+            if(v === 'J' || v === 'Q' || v === 'K') weight = 10;
+            if(v === 'A') weight = 11;
+            if(isNaN(weight)) weight = 10;
+            return { val: v, suit: suits[Math.floor(Math.random()*4)], weight: weight };
+        };
+
+        window.renderCard = function(card, container) {
+            if(!container) return;
+            const el = document.createElement('div');
+            el.className = 'w-16 h-24 bg-white rounded-lg text-black flex flex-col items-center justify-center shadow-lg border-2 border-slate-300 ml-[-20px] first:ml-0 transform hover:-translate-y-2 transition-transform';
+            el.innerHTML = `<div class="font-bold text-lg">${card.val}</div><div class="${(card.suit === '♥' || card.suit === '♦') ? 'text-red-500' : 'text-black'} text-xl">${card.suit}</div>`;
+            container.appendChild(el);
+        };
+
+        window.calcScore = function(hand) {
+            let score = 0;
+            let aces = 0;
+            hand.forEach(c => {
+                score += c.weight;
+                if(c.val === 'A') aces++;
+            });
+            while(score > 21 && aces > 0) {
+                score -= 10;
+                aces--;
+            }
+            return score;
+        };
+
+        window.dealBlackjack = function() {
+            const betInput = document.getElementById('bj-bet');
+            const bet = parseFloat(betInput ? betInput.value : 50);
+            if(bet > window.gameState.balance) return window.showToast('Error', 'Insufficient funds', 'error');
+            
+            window.gameState.balance -= bet;
+            window.updateUI();
+            
+            bjGameActive = true;
+            bjPlayerHand = [window.getCard(), window.getCard()];
+            bjDealerHand = [window.getCard()]; 
+
+            const betPhase = document.getElementById('bj-bet-phase');
+            if(betPhase) betPhase.classList.add('hidden');
+            const playPhase = document.getElementById('bj-play-phase');
+            if(playPhase) playPhase.classList.remove('hidden');
+            const result = document.getElementById('bj-result');
+            if(result) result.classList.add('hidden');
+
+            window.renderBjHands();
+        };
+
+        window.renderBjHands = function() {
+            const pCon = document.getElementById('player-hand');
+            const dCon = document.getElementById('dealer-hand');
+            if(pCon) pCon.innerHTML = ''; 
+            if(dCon) dCon.innerHTML = '';
+            
+            bjPlayerHand.forEach(c => window.renderCard(c, pCon));
+            bjDealerHand.forEach(c => window.renderCard(c, dCon));
+            
+            const pScore = document.getElementById('player-score');
+            if(pScore) pScore.innerText = window.calcScore(bjPlayerHand);
+            const dScore = document.getElementById('dealer-score');
+            if(dScore) dScore.innerText = window.calcScore(bjDealerHand);
+        };
+
+        window.hitBlackjack = function() {
+            bjPlayerHand.push(window.getCard());
+            window.renderBjHands();
+            if(window.calcScore(bjPlayerHand) > 21) window.endBlackjack(false);
+        };
+
+        window.standBlackjack = function() {
+            while(window.calcScore(bjDealerHand) < 17) {
+                bjDealerHand.push(window.getCard());
+            }
+            window.renderBjHands();
+            const pScore = window.calcScore(bjPlayerHand);
+            const dScore = window.calcScore(bjDealerHand);
+            
+            if(dScore > 21 || pScore > dScore) window.endBlackjack(true);
+            else if (pScore === dScore) window.endBlackjack(null);
+            else window.endBlackjack(false);
+        };
+
+        window.endBlackjack = function(win) {
+            bjGameActive = false;
+            const result = document.getElementById('bj-result');
+            if(result) result.classList.remove('hidden');
+            const resText = document.getElementById('bj-result-text');
+            const betInput = document.getElementById('bj-bet');
+            const bet = parseFloat(betInput ? betInput.value : 50);
+            
+            if(resText) {
+                if(win === true) {
+                    resText.innerText = "YOU WIN";
+                    resText.className = "text-3xl font-bold text-green-500 mb-2";
+                    const finalWin = window.applyRankBoost(bet, bet * 2);
+                    window.gameState.balance += finalWin;
+                } else if (win === false) {
+                    resText.innerText = "DEALER WINS";
+                    resText.className = "text-3xl font-bold text-red-500 mb-2";
+                } else {
+                    resText.innerText = "PUSH (TIE)";
+                    resText.className = "text-3xl font-bold text-slate-300 mb-2";
+                    window.gameState.balance += bet;
+                }
+            }
+            window.updateUI();
+            if(window.syncBalance) window.syncBalance();
+        };
+
+        window.resetBlackjack = function() {
+            const result = document.getElementById('bj-result');
+            if(result) result.classList.add('hidden');
+            const betPhase = document.getElementById('bj-bet-phase');
+            if(betPhase) betPhase.classList.remove('hidden');
+            const playPhase = document.getElementById('bj-play-phase');
+            if(playPhase) playPhase.classList.add('hidden');
+            
+            const pHand = document.getElementById('player-hand');
+            if(pHand) pHand.innerHTML = '';
+            const dHand = document.getElementById('dealer-hand');
+            if(dHand) dHand.innerHTML = '';
+            
+            const pScore = document.getElementById('player-score');
+            if(pScore) pScore.innerText = '0';
+            const dScore = document.getElementById('dealer-score');
+            if(dScore) dScore.innerText = '0';
+        };
+
+        // --- Store Logic ---
+        window.buyPack = function(name, price, value) {
+            window.showToast('Processing', 'Contacting payment gateway...');
+            
+            setTimeout(() => {
+                let bonus = 0;
+                if (window.gameState.rank === 'MVP') bonus = value * 0.10;
+                else if (window.gameState.rank === 'VIP') bonus = value * 0.05;
+                
+                const totalValue = value + bonus;
+                window.gameState.zcBalance += totalValue;
+                
+                const bonusText = bonus > 0 ? ` (+${bonus.toLocaleString()} Bonus)` : '';
+                window.showToast('Purchase Successful', `Added ${totalValue.toLocaleString()} ZC ${bonusText}`, 'success');
+                window.updateUI();
+                if(window.syncBalance) window.syncBalance();
+            }, 1500);
+        };
+
+        window.buyRank = function(rankName, price) {
+            if (window.gameState.rank === rankName) {
+                window.showToast('Info', `You are already ${rankName}!`);
+                return;
+            }
+            window.showToast('Processing', `Activating ${rankName} subscription...`);
+            
+            setTimeout(() => {
+                window.gameState.rank = rankName;
+                window.showToast('Upgrade Successful', `Welcome to ${rankName}!`, 'success');
+                if(window.syncBalance) window.syncBalance();
+                window.updateUI();
+            }, 1500);
+        };
+
+        // --- Vault Logic ---
+        window.exchangeToVault = function() {
+            const input = document.getElementById('vault-exchange-amount');
+            const amount = parseFloat(input.value);
+            
+            if (isNaN(amount) || amount <= 0) return window.showToast('Error', 'Invalid amount', 'error');
+            if (amount > window.gameState.zcBalance) return window.showToast('Error', 'Insufficient ZC', 'error');
+
+            const rate = 1; // 1 ZC = $1 Game Cash
+            const gameCash = amount * rate;
+
+            window.gameState.zcBalance -= amount;
+            window.gameState.balance += gameCash;
+            
+            input.value = '';
+            window.showToast('Exchange Successful', `Swapped ${amount.toLocaleString()} ZC for $${gameCash.toFixed(2)} Game Cash`, 'success');
+            
+            window.updateUI();
+            if(window.syncBalance) window.syncBalance();
+        };
+
+        // --- Leaderboard Render ---
+        window.renderLeaderboard = function(players) {
+            const tbody = document.getElementById('leaderboard-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            
+            players.forEach((p, index) => {
+                // Safeguard against missing or corrupted DB entries
+                if (!p) return;
+                const uname = p.username || 'Unknown';
+                const uinit = uname.substring(0, 2).toUpperCase();
+                
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-white/5 transition-colors';
+                const rankColor = index === 0 ? 'text-zenith-gold' : (index === 1 ? 'text-slate-300' : (index === 2 ? 'text-orange-400' : 'text-slate-500'));
+                
+                let rankBadge = '';
+                let nameClass = p.userId === window.gameState.user?.uid ? 'text-zenith-accent font-bold' : 'text-slate-200';
+                
+                if (p.rank === 'MVP') {
+                    rankBadge = '<span class="ml-2 text-red-500" title="MVP">💎</span>';
+                    nameClass += ' text-yellow-400 font-extrabold drop-shadow-md';
+                } else if (p.rank === 'VIP') {
+                    rankBadge = '<span class="ml-2 text-zenith-gold" title="VIP">⭐</span>';
+                }
+
+                tr.innerHTML = `
+                    <td class="p-4 font-mono font-bold ${rankColor}">#${index + 1}</td>
+                    <td class="p-4 flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-zenith-700 flex items-center justify-center text-xs font-bold text-white">${uinit}</div>
+                        <span class="${nameClass}">${uname}</span>
+                        ${rankBadge}
+                    </td>
+                    <td class="p-4 text-right font-mono text-zenith-success">$${(p.netWorth || 0).toLocaleString()}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        // --- Market Simulation Timer ---
+        setInterval(() => {
+            if(!window.gameState || !window.gameState.marketPrices) return;
+            
+            const tickers = Object.keys(window.gameState.marketPrices);
+            tickers.forEach(t => {
+                // Percentage based swings (up to 2% per tick)
+                const swing = window.gameState.marketPrices[t] * 0.02;
+                const change = (Math.random() - 0.48) * 2 * swing;
+                window.gameState.marketPrices[t] = Math.max(0.000001, window.gameState.marketPrices[t] + change);
+            });
+            
+            if(window.updateUI) window.updateUI();
+        }, 2000);
+
+        // --- Passive Income Loop ---
+        setInterval(() => {
+            if (!window.gameState || !window.gameState.rank) return;
+            
+            let hourlyRate = 0;
+            if (window.gameState.rank === 'VIP') hourlyRate = 1000;
+            if (window.gameState.rank === 'MVP') hourlyRate = 3000;
+            
+            if (hourlyRate > 0) {
+                const perSecond = hourlyRate / 3600;
+                window.gameState.balance += perSecond;
+                if(window.updateUI) window.updateUI();
+            }
+        }, 1000);
+
+        setInterval(() => {
+            if (window.gameState && window.gameState.rank && window.syncBalance) {
+                window.syncBalance();
+            }
+        }, 30000);
+
+        // --- Initial DOM Setup ---
+        document.addEventListener('DOMContentLoaded', () => {
+             if(window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+             if(window.renderMarket) window.renderMarket();
+             if(document.getElementById('game-selection') && document.getElementById('game-selection').children.length === 0) {
+                 window.populateGamesGrid();
+             }
+        });
+
+        // --- Sound Engine ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playClickSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.08);
+            gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime); 
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.08);
+        }
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('button') || e.target.closest('a') || e.target.closest('.glass-panel') || e.target.closest('input') || e.target.closest('select')) {
+                playClickSound();
+            }
+        });
+
+        // --- Missing Game Helper Function ---
+        window.closeGame = function() {
+            if(crashRunning) return window.showToast('Error', 'Game in progress!', 'error');
+            document.querySelectorAll('.active-game').forEach(g => g.classList.add('hidden'));
+            const selection = document.getElementById('game-selection');
+            if(selection) selection.classList.remove('hidden');
+        };
+
+    </script>
+
+    <!-- FIREBASE MODULE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken, GoogleAuthProvider, linkWithPopup, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, updateDoc, increment, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Integrated specific project credentials
+        const firebaseConfig = {
+            apiKey: "AIzaSyBnyBvI6ezrPar_uKow5zjkIr2NX3txTrg",
+            authDomain: "zenithprime-1.firebaseapp.com",
+            databaseURL: "https://zenithprime-1-default-rtdb.firebaseio.com",
+            projectId: "zenithprime-1",
+            storageBucket: "zenithprime-1.firebasestorage.app",
+            messagingSenderId: "829724461612",
+            appId: "1:829724461612:web:eea02437f21551863e9f89",
+            measurementId: "G-2WZPYXDFDZ"
+        };
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'zenithprime-1';
+        
+        try {
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+
+            // EXPORT DB Functions for Global use (Arena)
+            window.fbDb = db;
+            window.appIdRef = appId;
+            window.fbCollection = collection;
+            window.fbDoc = doc;
+            window.fbAddDoc = addDoc;
+            window.fbUpdateDoc = updateDoc;
+            window.fbDeleteDoc = deleteDoc;
+
+            // --- Google Link Logic ---
+            const googleProvider = new GoogleAuthProvider();
+            window.linkGoogleAccount = async () => {
+                if (!window.gameState.user) return;
+                try {
+                    if(window.showToast) window.showToast('Connecting...', 'Opening Google Login...', 'info');
+                    // Check if already signed in anonymously and we are trying to link
+                    if (auth.currentUser && auth.currentUser.isAnonymous) {
+                         await linkWithPopup(auth.currentUser, googleProvider);
+                    } else {
+                         // Fallback to normal sign in if not anonymous or missing user
+                         await signInWithPopup(auth, googleProvider);
+                    }
+                    
+                    window.gameState.user = auth.currentUser; // Refresh user state
+                    if(window.showToast) window.showToast('Success', 'Google account linked successfully!', 'success');
+                    if(window.openProfile) window.openProfile(); // Refresh the profile UI to hide button
+                } catch (error) {
+                    if (error.code === 'auth/unauthorized-domain') {
+                        // Mock the link for the preview environment
+                        if(window.showToast) window.showToast('Mock Link', 'Domain unauthorized in preview environment. Mocking successful link...', 'success');
+                        
+                        window.gameState.isGoogleLinkedMock = true;
+                        window.gameState.mockEmail = 'player@gmail.com';
+                        
+                        if(window.openProfile) window.openProfile();
+                    } else if (error.code === 'auth/credential-already-in-use') {
+                        if(window.showToast) window.showToast('Error', 'Google account already linked to another profile. Try logging in directly if you want to use it.', 'error');
+                    } else if (error.code === 'auth/popup-closed-by-user') {
+                        if(window.showToast) window.showToast('Cancelled', 'Google login was closed.', 'info');
+                    } else {
+                        console.error("Google Link Error:", error);
+                        if(window.showToast) window.showToast('Error', 'Failed to link Google account: ' + error.message, 'error');
+                    }
+                }
+            };
+
+            const initAuth = async () => {
+                try {
+                    let signedIn = false;
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        try {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                            signedIn = true;
+                        } catch (tokenError) {
+                            console.warn("Env token failed (expected if using custom keys). Falling back to Anon.");
+                        }
+                    }
+
+                    if (!signedIn) {
+                        await signInAnonymously(auth);
+                    }
+                } catch (e) {
+                    console.error("Auth failed:", e);
+                    if(window.showToast) window.showToast("Offline Mode", "Could not connect to servers.");
+                } finally {
+                     const loader = document.getElementById('loader');
+                     if(loader) loader.style.display = 'none';
+                }
+            };
+
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    if (window.gameState) {
+                        window.gameState.user = user;
+                    }
+                    
+                    const userRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'main');
+                    
+                    // User Data Profile
+                    onSnapshot(userRef, (docSnap) => {
+                        if (docSnap.exists()) {
+                            const data = docSnap.data();
+                            if(window.gameState) {
+                                let currentBalance = data.balance || 1000;
+                                
+                                if (data.rank && data.lastLogin) {
+                                    const lastTime = new Date(data.lastLogin).getTime();
+                                    const now = Date.now();
+                                    const diffHours = Math.min(24, (now - lastTime) / (1000 * 60 * 60));
+                                    
+                                    if (diffHours > 0.01) { 
+                                        let rate = 0;
+                                        if (data.rank === 'VIP') rate = 1000;
+                                        if (data.rank === 'MVP') rate = 3000;
+                                        
+                                        const earned = rate * diffHours;
+                                        if (earned > 1) {
+                                            currentBalance += earned;
+                                            setTimeout(() => {
+                                                if(window.showToast) window.showToast('Passive Income', `You earned $${Math.floor(earned).toLocaleString()} while away!`, 'success');
+                                            }, 2000);
+                                        }
+                                    }
+                                }
+
+                                window.gameState.balance = currentBalance;
+                                window.gameState.zcBalance = data.zcBalance || 0; 
+                                window.gameState.portfolio = { ...window.gameState.portfolio, ...(data.portfolio || {}) };
+                                window.gameState.rank = data.rank || null;
+                                window.gameState.username = data.username || `Trader_${user.uid.slice(0,4)}`;
+                            }
+                            if(window.updateUI) window.updateUI();
+                            
+                            // FORCE SYNC: Pushes your current data to the leaderboard instantly on load
+                            if(window.syncBalance) setTimeout(window.syncBalance, 1000);
+
+                        } else {
+                            // Create new profile
+                            setDoc(userRef, {
+                                balance: 1000,
+                                zcBalance: 0,
+                                portfolio: window.gameState ? window.gameState.portfolio : {},
+                                rank: null,
+                                username: `Trader_${user.uid.slice(0,4)}`,
+                                createdAt: new Date().toISOString(),
+                                lastLogin: new Date().toISOString()
+                            }).then(() => {
+                                // Sync new user immediately to leaderboard
+                                if(window.syncBalance) window.syncBalance();
+                            });
+                        }
+                        const loader = document.getElementById('loader');
+                        if(loader) loader.style.display = 'none';
+                    }, (error) => console.log("Snapshot Error", error));
+
+                    // Leaderboard Setup
+                    const lbRef = collection(db, 'artifacts', appId, 'public', 'data', 'leaderboard');
+                    onSnapshot(lbRef, (snapshot) => {
+                        const players = [];
+                        snapshot.forEach(doc => players.push(doc.data()));
+                        players.sort((a, b) => b.netWorth - a.netWorth);
+                        if(window.renderLeaderboard) window.renderLeaderboard(players.slice(0, 10));
+                    });
+
+                    // PVP Arena Setup
+                    const pvpRef = collection(db, 'artifacts', appId, 'public', 'data', 'pvp_matches');
+                    onSnapshot(pvpRef, (snapshot) => {
+                        const matches = [];
+                        snapshot.forEach(d => matches.push({ id: d.id, ...d.data() }));
+                        
+                        const now = Date.now();
+                        // Hide matches resolved more than 15 seconds ago
+                        const displayMatches = matches.filter(m => m.status === 'waiting' || (m.status === 'resolved' && (now - m.resolvedAt) < 15000));
+                        
+                        if(window.renderArena) window.renderArena(displayMatches);
+                        if(window.checkMatchResolutions) window.checkMatchResolutions(matches);
+                    });
+                }
+            });
+
+            window.syncBalance = async () => {
+                if (!window.gameState || !window.gameState.user) return;
+                const userRef = doc(db, 'artifacts', appId, 'users', window.gameState.user.uid, 'profile', 'main');
+                
+                let stockValue = 0;
+                for(let [ticker, qty] of Object.entries(window.gameState.portfolio)) {
+                    stockValue += qty * window.gameState.marketPrices[ticker];
+                }
+                const netWorth = window.gameState.balance + stockValue;
+
+                await updateDoc(userRef, {
+                    balance: window.gameState.balance,
+                    zcBalance: window.gameState.zcBalance || 0,
+                    portfolio: window.gameState.portfolio,
+                    rank: window.gameState.rank || null,
+                    username: window.gameState.username,
+                    lastLogin: new Date().toISOString()
+                });
+
+                const lbDoc = doc(db, 'artifacts', appId, 'public', 'data', 'leaderboard', window.gameState.user.uid);
+                await setDoc(lbDoc, {
+                    username: window.gameState.username,
+                    netWorth: Math.floor(netWorth),
+                    userId: window.gameState.user.uid,
+                    rank: window.gameState.rank || null
+                });
+            };
+
+            initAuth();
+
+        } catch (err) {
+            console.error("Firebase Init Error", err);
+        }
+    </script>
+</body>
+</html>
+    </textarea>
+
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-6 right-6 bg-[#1a1a1a] border border-purple-500/50 text-white px-6 py-3 rounded-lg shadow-[0_0_20px_rgba(168,85,247,0.3)] transform translate-y-24 opacity-0 transition-all duration-300 z-[100] flex items-center gap-3">
         <i class="fa-solid fa-circle-check text-purple-500"></i>
@@ -1242,7 +3680,28 @@
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             
-            titleEl.innerHTML = `<i class="fa-solid fa-gamepad text-purple-500"></i> <span>${title}</span>`;
+            titleEl.innerHTML = `<i class="fa-solid fa-gamepad text-purple-500 text-sm"></i> <span>${title}</span>`;
+            frame.src = url;
+            
+            setTimeout(() => frame.focus(), 500);
+        }
+
+        function openZenithPrime() {
+            stats.gamesPlayed++;
+            saveStats();
+
+            const code = document.getElementById('zenith-prime-source').value;
+            const blob = new Blob([code], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            
+            const modal = document.getElementById('game-modal');
+            const frame = document.getElementById('game-frame');
+            const titleEl = document.getElementById('game-title');
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            titleEl.innerHTML = `<i class="fa-solid fa-bolt text-[#6366f1] text-sm"></i> <span>Zenith Prime</span>`;
             frame.src = url;
             
             setTimeout(() => frame.focus(), 500);
