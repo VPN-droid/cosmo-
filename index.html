@@ -119,6 +119,31 @@
             margin-left: 2px;
         }
         @keyframes blink { 50% { opacity: 0; } }
+
+        /* --- UI ANIMATIONS --- */
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-fade-scale {
+            animation: fadeInScale 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        @keyframes fade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .animate-fade {
+            animation: fade 0.3s ease-out forwards;
+        }
     </style>
 </head>
 <body class="text-white flex h-screen">
@@ -152,6 +177,9 @@
             <button onclick="switchTab('settings')" class="nav-btn nav-item w-9 h-9 flex items-center justify-center mx-auto" data-target="settings" title="Settings">
                 <i class="fa-solid fa-gear text-base"></i>
             </button>
+            <button onclick="window.open('https://aistudio.google.com/prompts/new_chat', '_blank')" class="nav-btn nav-item w-9 h-9 flex items-center justify-center mx-auto hover:text-purple-400 transition-colors" title="Google AI Studio">
+                <i class="fa-solid fa-robot text-base"></i>
+            </button>
         </div>
 
         <!-- Bottom Actions -->
@@ -169,7 +197,7 @@
     <main class="flex-1 relative z-10 overflow-hidden">
         
         <!-- HOME VIEW (Matches Screenshot exactly) -->
-        <section id="home-view" class="tab-content absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-300">
+        <section id="home-view" class="tab-content absolute inset-0 flex flex-col items-center justify-center animate-fade-in">
             <div class="absolute top-4 right-6 text-gray-400 hover:text-white cursor-pointer transition-colors">
                 <i class="fa-solid fa-bullhorn text-lg"></i>
             </div>
@@ -187,7 +215,7 @@
         </section>
 
         <!-- GAMES VIEW -->
-        <section id="games-view" class="tab-content absolute inset-0 hidden p-6 md:p-8 overflow-y-auto">
+        <section id="games-view" class="tab-content absolute inset-0 hidden p-6 md:p-8 overflow-y-auto animate-fade-in">
             <div class="max-w-7xl mx-auto">
                 <div class="mb-6 flex justify-between items-end border-b border-gray-800 pb-3">
                     <div>
@@ -404,7 +432,7 @@
         </section>
 
         <!-- SEARCH / BROWSER VIEW -->
-        <section id="search-view" class="tab-content absolute inset-0 hidden flex-col h-full">
+        <section id="search-view" class="tab-content absolute inset-0 hidden flex-col h-full animate-fade-in">
             <!-- Search Home -->
             <div id="search-home" class="flex-1 flex flex-col items-center justify-center p-6 transition-all duration-300">
                 <div class="max-w-xl w-full text-center transform -translate-y-8">
@@ -456,61 +484,9 @@
             </div>
         </section>
 
-        <!-- SEARCH / BROWSER VIEW -->
-        <section id="search-view" class="tab-content absolute inset-0 hidden flex-col h-full">
-            <!-- Search Home -->
-            <div id="search-home" class="flex-1 flex flex-col items-center justify-center p-6 transition-all duration-300">
-                <div class="max-w-xl w-full text-center transform -translate-y-8">
-                    <h2 class="text-3xl font-bold tracking-tight mb-6">
-                        Cosmo<span class="text-purple-500">Search</span>
-                    </h2>
-                    
-                    <form onsubmit="handleSearch(event)" class="relative group w-full">
-                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                            <i class="fa-solid fa-search text-gray-500 group-hover:text-purple-400 transition-colors text-sm"></i>
-                        </div>
-                        <input type="text" id="search-input" placeholder="Search the web securely..." 
-                            class="search-input w-full text-white rounded-full py-3 pl-12 pr-28 text-base">
-                        <button type="submit" class="absolute inset-y-1.5 right-1.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-5 rounded-full font-bold text-sm transition-all hover:opacity-90">
-                            Search
-                        </button>
-                    </form>
-                    <p class="text-xs text-gray-500 mt-4">Powered by Google secure iframe bypass.</p>
-                </div>
-            </div>
-
-            <!-- Active Browser Iframe -->
-            <div id="browser-container" class="hidden flex-col h-full w-full bg-[#0a0a0a] relative z-20">
-                <div class="h-12 bg-[#111114] border-b border-[#222] flex items-center px-4 justify-between">
-                    <div class="flex items-center gap-2 w-full max-w-lg">
-                        <button onclick="closeBrowser()" class="text-purple-400 hover:text-white transition-colors p-1.5" title="Close">
-                            <i class="fa-solid fa-xmark text-lg"></i>
-                        </button>
-                        <button onclick="document.getElementById('main-browser').contentWindow.location.reload()" class="text-gray-400 hover:text-white transition-colors p-1.5">
-                            <i class="fa-solid fa-rotate-right text-sm"></i>
-                        </button>
-                        <div class="flex-1 bg-black rounded-full px-3 py-1.5 text-[11px] text-gray-300 truncate border border-[#333] flex items-center gap-2">
-                            <i class="fa-solid fa-lock text-purple-500"></i>
-                            <span class="text-gray-400" id="browser-url-text">Secure Frame Tunnel</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="openCloaked(document.getElementById('main-browser').src)" class="text-purple-400 hover:text-white bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 px-3 py-1 rounded text-xs font-medium transition-all flex items-center gap-1.5" title="Bypass strict filters">
-                            <i class="fa-solid fa-mask"></i> <span>Cloak Tab</span>
-                        </button>
-                    </div>
-                </div>
-                <!-- Notice -->
-                <div class="bg-purple-900/30 text-purple-200 text-[10px] py-1 text-center border-b border-purple-500/20 shadow-[0_2px_5px_rgba(0,0,0,0.5)]">
-                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> If the search refuses to connect, click the <b>Cloak Tab</b> button above to bypass the block!
-                </div>
-                <iframe id="main-browser" src="" sandbox="allow-scripts allow-same-origin allow-popups allow-forms" class="w-full flex-1 border-0 bg-white"></iframe>
-            </div>
-        </section>
-
         <!-- SETTINGS VIEW (Apple Glass Tabs) -->
-        <section id="settings-view" class="tab-content absolute inset-0 hidden p-4 md:p-6 z-10 flex-col items-center justify-center">
-            <div class="glass-panel w-full max-w-[900px] h-full max-h-[80vh] rounded-2xl flex flex-col md:flex-row overflow-hidden relative shadow-2xl">
+        <section id="settings-view" class="tab-content absolute inset-0 hidden p-4 md:p-6 z-10 flex-col items-center justify-center animate-fade-in">
+            <div class="glass-panel w-full max-w-[900px] h-full max-h-[80vh] rounded-2xl flex flex-col md:flex-row overflow-hidden relative shadow-2xl animate-fade-scale">
                 
                 <!-- Settings Sidebar -->
                 <div class="w-full md:w-[200px] border-b md:border-b-0 md:border-r border-white/5 flex flex-col py-6 flex-shrink-0 bg-white/[0.02]">
@@ -568,7 +544,7 @@
                 <div class="flex-1 overflow-y-auto p-6 md:p-8 relative">
                     
                     <!-- Proxy & Browser Tab (Active by default) -->
-                    <div id="settings-content-proxy" class="settings-inner-tab space-y-4 max-w-2xl mx-auto w-full">
+                    <div id="settings-content-proxy" class="settings-inner-tab space-y-4 max-w-2xl mx-auto w-full animate-fade-in">
                         <!-- Proxy Card -->
                         <div class="glass-card p-5 shadow-lg transition-all hover:bg-white/[0.05]">
                             <h3 class="text-lg font-bold text-white mb-2 tracking-wide drop-shadow-md">Proxy</h3>
@@ -627,7 +603,7 @@
                     </div>
 
                     <!-- Cloaking Tab -->
-                    <div id="settings-content-cloaking" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full">
+                    <div id="settings-content-cloaking" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full animate-fade-in">
                         <div class="glass-card p-6">
                             <h3 class="text-xl font-bold text-white mb-2"><i class="fa-solid fa-mask mr-2 text-gray-400"></i> Tab Disguise</h3>
                             <p class="text-[#94a3b8] text-xs mb-6">Change the appearance of the current tab to hide it from teachers and history logs.</p>
@@ -661,7 +637,7 @@
                     </div>
 
                     <!-- Performance Tab -->
-                    <div id="settings-content-performance" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full">
+                    <div id="settings-content-performance" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full animate-fade-in">
                         <div class="glass-card p-6">
                             <h3 class="text-xl font-bold text-white mb-2"><i class="fa-solid fa-gauge-high mr-2 text-green-400"></i> Performance Settings</h3>
                             <p class="text-[#94a3b8] text-xs mb-6">Disable visual effects to increase framerate and save battery on lower-end devices.</p>
@@ -693,7 +669,7 @@
                     </div>
 
                     <!-- Themes Tab -->
-                    <div id="settings-content-themes" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full">
+                    <div id="settings-content-themes" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full animate-fade-in">
                         <div class="glass-card p-6">
                             <h3 class="text-xl font-bold text-white mb-2"><i class="fa-solid fa-palette mr-2 text-pink-400"></i> Appearance</h3>
                             <p class="text-[#94a3b8] text-xs mb-6">Select a color scheme. This changes the glows, text gradients, and canvas background.</p>
@@ -728,7 +704,7 @@
                     </div>
 
                     <!-- Advertising Tab -->
-                    <div id="settings-content-advertising" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full">
+                    <div id="settings-content-advertising" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full animate-fade-in">
                         <div class="glass-card p-6">
                             <h3 class="text-xl font-bold text-white mb-2"><i class="fa-solid fa-bullhorn mr-2 text-yellow-400"></i> Advertising & Support</h3>
                             <p class="text-[#94a3b8] text-xs mb-6">Support the developers by allowing unintrusive advertisements.</p>
@@ -749,7 +725,7 @@
                     </div>
 
                     <!-- Account Tab -->
-                    <div id="settings-content-account" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full">
+                    <div id="settings-content-account" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full animate-fade-in">
                         <div class="glass-card p-6 flex flex-col items-center justify-center text-center py-10">
                             <div class="w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(168,85,247,0.4)]">
                                 <i class="fa-solid fa-user text-3xl text-white"></i>
@@ -761,7 +737,7 @@
                     </div>
 
                     <!-- About / Statistics Tab -->
-                    <div id="settings-content-about" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full">
+                    <div id="settings-content-about" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full animate-fade-in">
                         <div class="grid grid-cols-2 gap-4">
                             <div class="glass-card p-5 text-center">
                                 <i class="fa-solid fa-gamepad text-3xl text-[#818cf8] mb-2"></i>
@@ -783,7 +759,7 @@
                     </div>
 
                     <!-- News & Updates Tab -->
-                    <div id="settings-content-news" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full">
+                    <div id="settings-content-news" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full animate-fade-in">
                         <div class="glass-card p-6">
                             <h3 class="text-xl font-bold text-white mb-6"><i class="fa-solid fa-newspaper mr-2 text-blue-400"></i> Changelog</h3>
                             
@@ -812,7 +788,7 @@
                     </div>
 
                     <!-- FAQ Tab -->
-                    <div id="settings-content-faq" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full">
+                    <div id="settings-content-faq" class="settings-inner-tab hidden space-y-4 max-w-2xl mx-auto w-full animate-fade-in">
                         <div class="glass-card p-6">
                             <h3 class="text-xl font-bold text-white mb-6"><i class="fa-solid fa-circle-question mr-2 text-indigo-400"></i> Frequently Asked Questions</h3>
                             
@@ -834,7 +810,7 @@
                     </div>
 
                     <!-- Placeholder Tab (For disabled ones) -->
-                    <div id="settings-content-placeholder" class="settings-inner-tab hidden flex-col items-center justify-center h-full opacity-50 pt-6 w-full mx-auto">
+                    <div id="settings-content-placeholder" class="settings-inner-tab hidden flex-col items-center justify-center h-full opacity-50 pt-6 w-full mx-auto animate-fade-in">
                         <i class="fa-solid fa-screwdriver-wrench text-5xl text-gray-600 mb-4"></i>
                         <h3 class="text-xl font-bold text-gray-400">Under Construction</h3>
                         <p class="text-gray-500 text-sm mt-1">This settings page is coming soon.</p>
@@ -847,8 +823,8 @@
     </main>
 
     <!-- Game Player Modal -->
-    <div id="game-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex-col items-center justify-center backdrop-blur-2xl p-2 md:p-6">
-        <div class="w-full max-w-6xl glass-panel rounded-[1.5rem] flex flex-col h-full relative overflow-hidden">
+    <div id="game-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex-col items-center justify-center backdrop-blur-2xl p-2 md:p-6 animate-fade">
+        <div class="w-full max-w-6xl glass-panel rounded-[1.5rem] flex flex-col h-full relative overflow-hidden animate-fade-scale">
             
             <!-- Top Bar -->
             <div class="h-12 bg-white/[0.03] border-b border-white/10 flex items-center justify-between px-4 z-10">
@@ -1013,6 +989,7 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
+        // --- RESTORED ANIMATION & TYPING LOGIC ---
         class Particle {
             constructor() {
                 this.x = Math.random() * width;
@@ -1020,7 +997,7 @@
                 this.size = Math.random() * 2 + 0.5;
                 this.vx = (Math.random() - 0.5) * 0.5;
                 this.vy = (Math.random() - 0.5) * 0.5;
-                this.color = Math.random() > 0.5 ? '#a855f7' : '#d946ef';
+                this.color = Math.random() > 0.5 ? `rgba(${currentPurpleRGB}, 1)` : `rgba(${currentPinkRGB}, 1)`;
                 this.glow = Math.random() * 15 + 5;
             }
             update() {
@@ -1036,7 +1013,7 @@
                 ctx.shadowBlur = this.glow;
                 ctx.shadowColor = this.color;
                 ctx.fill();
-                ctx.shadowBlur = 0; // reset
+                ctx.shadowBlur = 0;
             }
         }
         
@@ -1099,13 +1076,13 @@
         function typeWriter() {
             if (charIndex < (baseText.length + gradientWord.length)) {
                 if (charIndex < baseText.length) {
-                    typedTextSpan.innerHTML = baseText.substring(0, charIndex + 1);
+                    if (typedTextSpan) typedTextSpan.innerHTML = baseText.substring(0, charIndex + 1);
                 } else {
                     const glowPart = gradientWord.substring(0, (charIndex + 1) - baseText.length);
-                    typedTextSpan.innerHTML = baseText + '<span class="text-gradient">' + glowPart + '</span>';
+                    if (typedTextSpan) typedTextSpan.innerHTML = baseText + '<span class="text-gradient">' + glowPart + '</span>';
                 }
                 charIndex++;
-                setTimeout(typeWriter, 120); // Typing speed
+                setTimeout(typeWriter, 120);
             }
         }
         
@@ -1117,14 +1094,22 @@
             const savedPink = localStorage.getItem('cosmo_theme_pink') || '#d946ef';
             setTheme(savedPurple, savedPink, false);
             
-            document.getElementById('proxy-select').value = localStorage.getItem('cosmo_proxy') || 'Scramjet';
-            document.getElementById('transport-select').value = localStorage.getItem('cosmo_transport') || 'Libcurl';
-            document.getElementById('wisp-input').value = localStorage.getItem('cosmo_wisp') || '';
+            const proxySelect = document.getElementById('proxy-select');
+            if (proxySelect) proxySelect.value = localStorage.getItem('cosmo_proxy') || 'Scramjet';
+            
+            const transportSelect = document.getElementById('transport-select');
+            if (transportSelect) transportSelect.value = localStorage.getItem('cosmo_transport') || 'Libcurl';
+            
+            const wispInput = document.getElementById('wisp-input');
+            if (wispInput) wispInput.value = localStorage.getItem('cosmo_wisp') || '';
             
             const savedTitle = localStorage.getItem('cosmo_cloak_title');
             const savedIcon = localStorage.getItem('cosmo_cloak_icon');
             if(savedTitle) document.title = savedTitle;
-            if(savedIcon) document.getElementById('favicon').href = savedIcon;
+            if(savedIcon) {
+                const favicon = document.getElementById('favicon');
+                if (favicon) favicon.href = savedIcon;
+            }
             
             updateStatsUI();
         });
